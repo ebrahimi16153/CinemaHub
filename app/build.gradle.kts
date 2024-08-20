@@ -53,6 +53,8 @@ android {
 //noinspection UseTomlInstead
 dependencies {
 
+    ///////////////////////Android libs//////////////////////////////////////////
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -96,5 +98,12 @@ dependencies {
     //viewModels()
     implementation ("androidx.fragment:fragment-ktx:1.8.2")
     implementation ("androidx.fragment:fragment-ktx:1.8.2")
+
+    //navigation
+    implementation ("androidx.navigation:navigation-compose:2.7.7")
+
+    //icons
+    implementation("androidx.compose.material:material-icons-extended")
+
 
 }

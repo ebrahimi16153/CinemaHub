@@ -11,37 +11,29 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.github.ebrahimi16153.cinemahub.ui.navigation.MainScaffold
 import com.github.ebrahimi16153.cinemahub.ui.theme.CinemaHubTheme
 
 class MainActivity : ComponentActivity() {
+
+        
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CinemaHubTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            val navHostController = rememberNavController()
+            CinemaHub(navHostController = navHostController)
+
             }
         }
-    }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
+fun CinemaHub(navHostController: NavHostController){
     CinemaHubTheme {
-        Greeting("Android")
+        MainScaffold(navController = navHostController)
     }
 }

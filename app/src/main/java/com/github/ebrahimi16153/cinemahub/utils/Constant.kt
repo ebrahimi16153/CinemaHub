@@ -4,6 +4,7 @@ const val CONNECTION_TIMEOUT = 25L
 const val API_KEY = "444a3900eac59a6892d47a7250a984f5"
 const val BASE_URL = "https://api.themoviedb.org/3/"
 const val IMAGE_URL = "https://image.tmdb.org/t/p/w500"
+val BOTTOM_ITEMS = listOf(Route.Home,Route.Search,Route.Saved,Route.Profile)
 
 
 fun Int.toHours(mint:Double): String {
