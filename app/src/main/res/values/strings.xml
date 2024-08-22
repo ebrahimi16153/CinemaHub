@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">CinemaHub</string>
+    <string name="home_top_profile">HomeTopProfile</string>
+    <string name="poster_of_main_banner">poster</string>
+    <string name="watch_now">Watch Now</string>
+    <string name="exclusive">Exclusively On CinemaHub</string>
 </resources>

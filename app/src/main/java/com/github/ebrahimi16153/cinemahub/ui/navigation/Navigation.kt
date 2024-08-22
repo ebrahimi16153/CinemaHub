@@ -9,14 +9,15 @@ import com.github.ebrahimi16153.cinemahub.ui.screen.profile.ProfileScreen
 import com.github.ebrahimi16153.cinemahub.ui.screen.saved.SaveScreen
 import com.github.ebrahimi16153.cinemahub.ui.screen.search.SearchScreen
 import com.github.ebrahimi16153.cinemahub.utils.Route
+import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 
 @Composable
-fun Navigation(navHostController: NavHostController) {
+fun Navigation(navHostController: NavHostController, homeViewModel: HomeViewModel) {
 
     NavHost(navController = navHostController, startDestination = Route.Home.name) {
 
         composable(Route.Home.name) {
-            HomeScreen(navHostController = navHostController)
+            HomeScreen(navHostController = navHostController,homeViewModel)
         }
 
         composable(Route.Search.name) {

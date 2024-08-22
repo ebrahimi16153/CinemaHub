@@ -6,12 +6,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyNavigationBar
+import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 
 @Composable
-fun MainScaffold(navController: NavHostController){
+fun MainScaffold(navController: NavHostController, homeViewModel: HomeViewModel){
 
     Scaffold(
         bottomBar = {
@@ -23,7 +23,7 @@ fun MainScaffold(navController: NavHostController){
             .fillMaxSize()
             .padding(itPadding)) {
             //content
-            Navigation(navHostController = navController)
+            Navigation(navHostController = navController,homeViewModel)
 
         }
     }

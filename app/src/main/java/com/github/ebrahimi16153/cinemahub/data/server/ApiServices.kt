@@ -3,11 +3,14 @@ package com.github.ebrahimi16153.cinemahub.data.server
 import android.media.tv.TvContract.Programs.Genres
 import com.github.ebrahimi16153.cinemahub.data.model.Credits
 import com.github.ebrahimi16153.cinemahub.data.model.ImageCollection
+import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetali
 import com.github.ebrahimi16153.cinemahub.data.model.Movies
 import com.github.ebrahimi16153.cinemahub.data.model.NowPlayingMovie
 import com.github.ebrahimi16153.cinemahub.data.model.Trailers
 import com.github.ebrahimi16153.cinemahub.utils.API_KEY
+import kotlinx.coroutines.flow.Flow
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -19,11 +22,11 @@ interface ApiServices {
     //  https://api.themoviedb.org/3/trending/movie/week?language=en-US&api_key=444a3900eac59a6892d47a7250a984f5
     //  tradingMovie
     @GET("trending/movie/{week}")
-    suspend fun getTrendingMovie(
+ suspend fun getTrendingMovie(
         @Path("week") duration: String = "week",
         @Query("language") language: String = "en-US",
         @Query("api_key") apiKey: String = API_KEY
-    ): Movies
+    ):Response<Movies>
 
 
     //    https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1&api_key=444a3900eac59a6892d47a7250a984f5

@@ -105,5 +105,9 @@ dependencies {
     //icons
     implementation("androidx.compose.material:material-icons-extended")
 
+    //image Loader Coil
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+
 
 }
