@@ -7,15 +7,26 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import kotlin.time.Duration
 
-class HomeRepository @Inject constructor(private val apiServices: ApiServices)  {
+class HomeRepository @Inject constructor(private val apiServices: ApiServices) {
 
-       suspend fun trendingMovie() :Flow<List<Movie>>{
-               val response = apiServices.getTrendingMovie()
-               if (response.isSuccessful){
-                       return flow { response.body()?.let { emit(it.results) } }
-               }else{
-                       return flow { emptyList<List<Movie>>() }
-               }
-       }
+    suspend fun trendingMovie(): Flow<List<Movie>> {
+        val response = apiServices.getTrendingMovie()
+        if (response.isSuccessful) {
+            return flow { response.body()?.let { emit(it.results) } }
+        } else {
+            return flow { emptyList<List<Movie>>() }
+        }
+    }
+
+
+    suspend fun nowPlayingMovie(): Flow<List<Movie>> {
+        val response = apiServices.getNowPlayingMovies()
+        return if (response.isSuccessful) {
+            flow { response.body()?.let { emit(it.results) } }
+        } else {
+            flow { emptyList<List<Movie>>() }
+        }
+
+    }
 
 }

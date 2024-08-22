@@ -4,4 +4,9 @@
     <string name="poster_of_main_banner">poster</string>
     <string name="watch_now">Watch Now</string>
     <string name="exclusive">Exclusively On CinemaHub</string>
+    <string name="last_movie">Last Movie</string>
+    <string name="playing_now">Playing Now</string>
+    <string name="top_movies">Top Movies(GOAT)</string>
+    <string name="popular">Popular</string>
+    <string name="coming_soon">Coming Soon</string>
 </resources>

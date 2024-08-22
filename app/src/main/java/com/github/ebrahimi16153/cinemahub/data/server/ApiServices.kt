@@ -36,7 +36,7 @@ interface ApiServices {
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
         @Query("api_key") apiKey: String = API_KEY
-    ): NowPlayingMovie
+    ): Response<NowPlayingMovie>
 
 
     //    https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1&api_key=444a3900eac59a6892d47a7250a984f5
