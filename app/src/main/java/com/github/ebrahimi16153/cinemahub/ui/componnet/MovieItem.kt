@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
+import com.github.ebrahimi16153.cinemahub.utils.IMAGE_URL
 
 @Composable
 fun GridMovieItems(movie: Movie, onMovieClick: (Int) -> Unit = {}) {
@@ -41,7 +42,7 @@ fun GridMovieItems(movie: Movie, onMovieClick: (Int) -> Unit = {}) {
             .clip(RoundedCornerShape(8.dp))
     ) {
         AsyncImage(
-            model = movie.posterPath,
+            model = IMAGE_URL+movie.posterPath,
             contentDescription = "",
             contentScale = ContentScale.Crop
         )
