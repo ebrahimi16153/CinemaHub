@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,8 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -46,6 +48,18 @@ import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewModel) {
 
+    ////////////////////getData////////////////////////////////////////////////////
+
+
+
+
+    val movies by homeViewModel.movieOfBanner.collectAsState()
+    val nowPlayingMovieList by homeViewModel.nowPlayingMovie.collectAsState()
+    val topRateMovie by homeViewModel.topRateMovie.collectAsState()
+    val popularMovie by homeViewModel.popularMovie.collectAsState()
+    val upcomingMovie by homeViewModel.upcomingMovie.collectAsState()
+
+
     ////////////////////handel orientation of screen /////////////////////////////////
 
     val configuration = LocalConfiguration.current
@@ -53,13 +67,25 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
     if (isLandscape) {
 
         //landscape design
-        LandscapeHome(navHostController = navHostController, homeViewModel)
+        LandscapeHome(
+            navHostController = navHostController,
+            mainBannerMovies = movies,
+            nowPlayingMovieList = nowPlayingMovieList,
+            topRateMovie = topRateMovie,
+            popularMovie = popularMovie,
+            upcomingMovie = upcomingMovie)
 
 
     } else {
 
         // portrait design
-        PortraitHome(navHostController = navHostController,homeViewModel= homeViewModel)
+        PortraitHome(
+            navHostController = navHostController,
+            mainBannerMovies = movies,
+            nowPlayingMovieList = nowPlayingMovieList,
+            topRateMovie = topRateMovie,
+            popularMovie = popularMovie,
+            upcomingMovie = upcomingMovie)
 
 
     }
@@ -68,37 +94,54 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
 
 
 @Composable
-fun PortraitHome(navHostController: NavHostController,homeViewModel: HomeViewModel) {
+fun PortraitHome(
+    navHostController: NavHostController,
+    mainBannerMovies: List<Movie>,
+    nowPlayingMovieList: List<Movie>,
+    topRateMovie: List<Movie>,
+    popularMovie: List<Movie>,
+    upcomingMovie: List<Movie>
+) {
 
-    homeViewModel.getMovieOFBanner()
-    val movies by homeViewModel.movieOfBanner.collectAsState()
-
-
-    Column(modifier = Modifier
-        .fillMaxSize()) {
-        //bannerSection
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
-            MyBanner(isLandscape = false, movies = movies) {
-                //todo onClick
+    LazyColumn {
+        item {
+            //bannerSection
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+                MyBanner(isLandscape = false, movies = mainBannerMovies) {
+                    //todo onClick
+                }
+                HomeTopBar()
             }
-            HomeTopBar()
         }
-        Spacer(modifier = Modifier.height(10.dp))
-        MovieSection(homeViewModel = homeViewModel)
-
-
+        item {
+            Spacer(modifier = Modifier.height(10.dp))
+            MovieSection(
+                nowPlayingMovieList = nowPlayingMovieList,
+                topRateMovie = topRateMovie,
+                popularMovie = popularMovie,
+                upcomingMovie = upcomingMovie,
+                navHostController = navHostController
+            )
+        }
     }
 }
 
 
 @Composable
-fun LandscapeHome(navHostController: NavHostController, homeViewModel: HomeViewModel) {
+fun LandscapeHome(
+    navHostController: NavHostController,
+    topRateMovie: List<Movie>,
+    nowPlayingMovieList: List<Movie>,
+    popularMovie: List<Movie>,
+    upcomingMovie: List<Movie>,
+    mainBannerMovies: List<Movie>
+) {
 
-    homeViewModel.getMovieOFBanner()
-    val movies by homeViewModel.movieOfBanner.collectAsState()
 
-
-    Row(modifier = Modifier.fillMaxSize()) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         //banner section
         Box(
             modifier = Modifier
@@ -106,7 +149,7 @@ fun LandscapeHome(navHostController: NavHostController, homeViewModel: HomeViewM
                 .fillMaxWidth(0.4f), contentAlignment = Alignment.TopCenter
         ) {
 
-            MyBanner(isLandscape = true, movies = movies) {
+            MyBanner(isLandscape = true, movies = mainBannerMovies) {
                 //todo onClick
             }
             HomeTopBar()
@@ -114,13 +157,21 @@ fun LandscapeHome(navHostController: NavHostController, homeViewModel: HomeViewM
 
         }
         // movie section
-        Box(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.6f), contentAlignment = Alignment.Center
+                .fillMaxWidth()
         ) {
-           MovieSection(homeViewModel = homeViewModel)
+            item {
+                MovieSection(
+                    nowPlayingMovieList = nowPlayingMovieList,
+                    topRateMovie = topRateMovie,
+                    popularMovie = popularMovie,
+                    upcomingMovie = upcomingMovie,
+                    navHostController = navHostController
+                )
 
+            }
         }
 
     }
@@ -182,17 +233,53 @@ fun MyBanner(isLandscape: Boolean, movies: List<Movie>, onBannerClick: (Int) -> 
 }
 
 @Composable
-fun MovieSection(homeViewModel: HomeViewModel){
+fun MovieSection(
+    navHostController: NavHostController,
+    nowPlayingMovieList: List<Movie>,
+    topRateMovie: List<Movie>,
+    popularMovie: List<Movie>,
+    upcomingMovie: List<Movie>
+) {
 
-    //get movies
-    homeViewModel.getNowPlayingMovies()
-    val nowPlayingMovieList by homeViewModel.nowPlayingMovie.collectAsState()
 
-    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start){
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.Start
+    ) {
         //nowPlaying
-        Text(text = stringResource(id = R.string.playing_now), style = MaterialTheme.typography.bodyMedium)
+        Text(
+            modifier = Modifier.padding(start = 16.dp),
+            text = stringResource(id = R.string.playing_now)
+        )
         Spacer(modifier = Modifier.height(10.dp))
         HorizontalMovieList(movies = nowPlayingMovieList)
+        // topRate
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            modifier = Modifier.padding(start = 16.dp),
+            text = stringResource(id = R.string.top_movies)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        HorizontalMovieList(movies = topRateMovie)
+        // popular
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            modifier = Modifier.padding(start = 16.dp),
+            text = stringResource(id = R.string.popular)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        HorizontalMovieList(movies = popularMovie)
+
+        // upComing
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            modifier = Modifier.padding(start = 16.dp),
+            text = stringResource(id = R.string.coming_soon)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        HorizontalMovieList(movies = upcomingMovie)
 
     }
 
@@ -200,11 +287,16 @@ fun MovieSection(homeViewModel: HomeViewModel){
 }
 
 @Composable
-fun HorizontalMovieList(movies: List<Movie>){
-    LazyRow {
+fun HorizontalMovieList(movies: List<Movie>) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp), // Consistent padding
+        horizontalArrangement = Arrangement.spacedBy(8.dp) // Spacing between items
+    ) {
 
-        items(items = movies){ itMovie ->
-            GridMovieItems(movie = itMovie)
+        itemsIndexed(items = movies ,key = { _, movie -> movie.id!! }) { index, itMovie ->
+
+                GridMovieItems(movie = itMovie)
+
         }
 
     }

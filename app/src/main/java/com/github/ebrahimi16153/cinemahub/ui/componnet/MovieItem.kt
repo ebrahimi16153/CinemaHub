@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +30,7 @@ fun GridMovieItems(movie: Movie, onMovieClick: (Int) -> Unit = {}) {
 
     val brush = Brush.verticalGradient(
         listOf(
-            MaterialTheme.colorScheme.background,
+            Color.Transparent,
             Color.Transparent,
             MaterialTheme.colorScheme.background
         )
@@ -38,6 +39,7 @@ fun GridMovieItems(movie: Movie, onMovieClick: (Int) -> Unit = {}) {
         modifier = Modifier
             .width(130.dp)
             .height(200.dp)
+            .padding(horizontal = 2.dp)
             .clickable { movie.id?.let { onMovieClick(it) } }
             .clip(RoundedCornerShape(8.dp))
     ) {

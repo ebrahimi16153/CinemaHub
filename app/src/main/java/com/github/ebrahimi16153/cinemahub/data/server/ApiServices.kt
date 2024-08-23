@@ -46,7 +46,7 @@ interface ApiServices {
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
         @Query("api_key") apiKey: String = API_KEY
-    ): Movies
+    ): Response<Movies>
 
     //    https://api.themoviedb.org/3/movie/popular?language=en-US&page=1&api_key=444a3900eac59a6892d47a7250a984f5
     //     popular
@@ -56,7 +56,7 @@ interface ApiServices {
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
         @Query("api_key") apiKey: String = API_KEY
-    ): Movies
+    ): Response<Movies>
 
     //    https://api.themoviedb.org/3/movie/upcoming?language=en-US&page=1&api_key=444a3900eac59a6892d47a7250a984f5
 
@@ -65,7 +65,7 @@ interface ApiServices {
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
         @Query("api_key") apiKey: String = API_KEY
-    ): NowPlayingMovie
+    ): Response<Movies>
 
 
     //    https://api.themoviedb.org/3/genre/movie/list?language=en&api_key=444a3900eac59a6892d47a7250a984f5

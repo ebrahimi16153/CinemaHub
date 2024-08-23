@@ -29,4 +29,47 @@ class HomeRepository @Inject constructor(private val apiServices: ApiServices) {
 
     }
 
+
+    suspend fun getTopRatedMovie():Flow<List<Movie>>{
+
+        val response = apiServices.getTopRatedMovie()
+        return if (response.isSuccessful){
+            flow { response.body()?.let { emit(it.results) } }
+        }else{
+            flow { emptyList<List<Movie>>() }
+        }
+
+
+    }
+
+
+
+    suspend fun getPopularMovie():Flow<List<Movie>>{
+
+        val response = apiServices.getPopularMovie()
+        return if (response.isSuccessful){
+            flow { response.body()?.let { emit(it.results) } }
+        }else{
+            flow { emptyList<List<Movie>>() }
+        }
+
+    }
+
+
+
+
+    suspend fun getUpcomingMovie():Flow<List<Movie>>{
+
+        val response = apiServices.getUpcomingMovies()
+        return if (response.isSuccessful){
+            flow { response.body()?.let { emit(it.results) } }
+        }else{
+            flow { emptyList<List<Movie>>() }
+        }
+
+
+    }
+
+
+
 }
