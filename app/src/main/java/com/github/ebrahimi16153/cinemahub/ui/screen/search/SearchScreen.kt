@@ -1,16 +1,107 @@
 package com.github.ebrahimi16153.cinemahub.ui.screen.search
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.github.ebrahimi16153.cinemahub.R
+import com.github.ebrahimi16153.cinemahub.data.model.Movie
+import com.github.ebrahimi16153.cinemahub.ui.componnet.GridMovieItems
+import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
 
 @Composable
-fun SearchScreen(navHostController: NavHostController){
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "Search")
+fun SearchScreen(navHostController: NavHostController, searchViewModel: SearchViewModel) {
+
+
+    val searchQuery by searchViewModel.searchQuery
+    val searchResponse  by searchViewModel.responseOfSearch.collectAsState()
+
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top) {
+           // searchNar
+            MySearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChange = {
+                    searchViewModel.setSearchQuery(it)
+                    searchViewModel.getResponseOfSearch(it)
+
+
+                })
+
+           //MovieList
+          GridMovieList(movies = searchResponse)
+
+
+
+
     }
+
+
+}
+
+
+@Preview
+@Composable
+fun MySearchBar(
+    searchQuery: String = "SearchBar",
+    onSearchQueryChange: (String) -> Unit = {}
+) {
+
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        value = searchQuery,
+        onValueChange = { onSearchQueryChange(it) },
+        maxLines = 1,
+        label = { Text(text = stringResource(id = R.string.search_label)) },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions.Default
+    )
+
+
+}
+
+
+@Preview
+@Composable
+fun GridMovieList(movies:List<Movie> = emptyList(), onMovieClick:(Int) -> Unit = {}){
+
+    LazyVerticalStaggeredGrid(
+        columns =StaggeredGridCells.Adaptive(130.dp),
+        contentPadding = PaddingValues(vertical = 16.dp),
+        verticalItemSpacing = 3.dp,
+        horizontalArrangement = Arrangement.spacedBy(1.dp)
+
+    ) {
+
+        itemsIndexed(items = movies){_,movie ->
+
+            GridMovieItems(movie = movie){ movieID ->
+                // onClick
+            }
+
+
+        }
+        
+    }
+
+
 }

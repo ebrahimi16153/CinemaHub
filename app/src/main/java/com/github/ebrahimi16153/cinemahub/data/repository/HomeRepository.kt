@@ -1,5 +1,7 @@
 package com.github.ebrahimi16153.cinemahub.data.repository
 
+import com.github.ebrahimi16153.cinemahub.data.model.Genre
+import com.github.ebrahimi16153.cinemahub.data.model.GenresOfMovie
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.server.ApiServices
 import kotlinx.coroutines.flow.Flow
@@ -38,8 +40,6 @@ class HomeRepository @Inject constructor(private val apiServices: ApiServices) {
         }else{
             flow { emptyList<List<Movie>>() }
         }
-
-
     }
 
 
@@ -66,8 +66,17 @@ class HomeRepository @Inject constructor(private val apiServices: ApiServices) {
         }else{
             flow { emptyList<List<Movie>>() }
         }
+    }
 
-
+    suspend fun getGenresList():Flow<List<Genre>>{
+        val response = apiServices.getGenres()
+       return if (response.isSuccessful){
+            flow {
+                response.body()?.let { emit(it.genres) }
+            }
+        }else{
+            flow { emptyList<List<Genre>>() }
+        }
     }
 
 

@@ -11,27 +11,40 @@ import androidx.navigation.compose.rememberNavController
 import com.github.ebrahimi16153.cinemahub.ui.navigation.MainScaffold
 import com.github.ebrahimi16153.cinemahub.ui.theme.CinemaHubTheme
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
+import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val homeViewMode:HomeViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels()
+    private val searchViewMode: SearchViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val navHostController = rememberNavController()
-            CinemaHub(navHostController = navHostController,homeViewMode)
+            CinemaHub(
+                navHostController = navHostController,
+                homeViewModel = homeViewModel,
+                searchViewModel = searchViewMode
+            )
 
-            }
         }
+    }
 }
 
 @Composable
-fun CinemaHub(navHostController: NavHostController,homeViewModel: HomeViewModel){
+fun CinemaHub(
+    navHostController: NavHostController,
+    homeViewModel: HomeViewModel,
+    searchViewModel: SearchViewModel
+) {
     CinemaHubTheme {
-        MainScaffold(navController = navHostController,homeViewModel)
+        MainScaffold(
+            navController = navHostController,
+            homeViewModel = homeViewModel,
+            searchViewModel = searchViewModel)
     }
 }

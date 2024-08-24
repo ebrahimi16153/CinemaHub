@@ -40,25 +40,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.github.ebrahimi16153.cinemahub.R
+import com.github.ebrahimi16153.cinemahub.data.model.Genre
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.ui.componnet.BannerItems
+import com.github.ebrahimi16153.cinemahub.ui.componnet.GenreItem
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GridMovieItems
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewModel) {
 
+
+
     ////////////////////getData////////////////////////////////////////////////////
-
-
-
-
     val movies by homeViewModel.movieOfBanner.collectAsState()
+    val genres by homeViewModel.genres.collectAsState()
     val nowPlayingMovieList by homeViewModel.nowPlayingMovie.collectAsState()
     val topRateMovie by homeViewModel.topRateMovie.collectAsState()
     val popularMovie by homeViewModel.popularMovie.collectAsState()
     val upcomingMovie by homeViewModel.upcomingMovie.collectAsState()
-
 
     ////////////////////handel orientation of screen /////////////////////////////////
 
@@ -73,7 +73,8 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
             nowPlayingMovieList = nowPlayingMovieList,
             topRateMovie = topRateMovie,
             popularMovie = popularMovie,
-            upcomingMovie = upcomingMovie)
+            upcomingMovie = upcomingMovie,
+            genres = genres)
 
 
     } else {
@@ -85,9 +86,8 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
             nowPlayingMovieList = nowPlayingMovieList,
             topRateMovie = topRateMovie,
             popularMovie = popularMovie,
-            upcomingMovie = upcomingMovie)
-
-
+            upcomingMovie = upcomingMovie,
+            genres = genres)
     }
 
 }
@@ -100,7 +100,8 @@ fun PortraitHome(
     nowPlayingMovieList: List<Movie>,
     topRateMovie: List<Movie>,
     popularMovie: List<Movie>,
-    upcomingMovie: List<Movie>
+    upcomingMovie: List<Movie>,
+    genres: List<Genre>
 ) {
 
     LazyColumn {
@@ -110,7 +111,13 @@ fun PortraitHome(
                 MyBanner(isLandscape = false, movies = mainBannerMovies) {
                     //todo onClick
                 }
-                HomeTopBar()
+                Column {
+                    HomeTopBar()
+                    HorizontalGenresList(genres = genres) {
+
+                    }
+
+                }
             }
         }
         item {
@@ -134,7 +141,8 @@ fun LandscapeHome(
     nowPlayingMovieList: List<Movie>,
     popularMovie: List<Movie>,
     upcomingMovie: List<Movie>,
-    mainBannerMovies: List<Movie>
+    mainBannerMovies: List<Movie>,
+    genres: List<Genre>
 ) {
 
 
@@ -152,7 +160,13 @@ fun LandscapeHome(
             MyBanner(isLandscape = true, movies = mainBannerMovies) {
                 //todo onClick
             }
-            HomeTopBar()
+            Column {
+                HomeTopBar()
+                HorizontalGenresList(genres = genres) {
+
+                }
+
+            }
 
 
         }
@@ -300,5 +314,22 @@ fun HorizontalMovieList(movies: List<Movie>) {
         }
 
     }
+}
+
+
+@Composable
+fun HorizontalGenresList(genres: List<Genre>, onGenreClick: (Int) -> Unit){
+
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp) // Spacing between items
+    ) {
+        itemsIndexed(genres  , key = {_,movie -> movie.id } ){_,genre ->
+            genre.name?.let {
+                GenreItem(text = it, onGenreClick = { onGenreClick(genre.id) })
+            }
+        }
+    }
+
 }
 

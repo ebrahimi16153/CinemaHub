@@ -9,9 +9,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyNavigationBar
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
+import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
 
 @Composable
-fun MainScaffold(navController: NavHostController, homeViewModel: HomeViewModel){
+fun MainScaffold(
+    navController: NavHostController,
+    homeViewModel: HomeViewModel,
+    searchViewModel: SearchViewModel
+){
 
     Scaffold(
         bottomBar = {
@@ -23,7 +28,7 @@ fun MainScaffold(navController: NavHostController, homeViewModel: HomeViewModel)
             .fillMaxSize()
             .padding(itPadding)) {
             //content
-            Navigation(navHostController = navController,homeViewModel)
+            Navigation(navHostController = navController, homeViewModel = homeViewModel,searchViewModel = searchViewModel)
 
         }
     }

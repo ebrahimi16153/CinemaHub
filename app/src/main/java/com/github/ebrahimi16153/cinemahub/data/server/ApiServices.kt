@@ -2,6 +2,8 @@ package com.github.ebrahimi16153.cinemahub.data.server
 
 import android.media.tv.TvContract.Programs.Genres
 import com.github.ebrahimi16153.cinemahub.data.model.Credits
+import com.github.ebrahimi16153.cinemahub.data.model.Genre
+import com.github.ebrahimi16153.cinemahub.data.model.GenresOfMovie
 import com.github.ebrahimi16153.cinemahub.data.model.ImageCollection
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetali
@@ -17,7 +19,7 @@ import retrofit2.http.Query
 
 interface ApiServices {
 
-    ////////////////////////HOME FRAGMENT API ///////////////////
+    ////////////////////////HOME Screen ///////////////////
 
     //  https://api.themoviedb.org/3/trending/movie/week?language=en-US&api_key=444a3900eac59a6892d47a7250a984f5
     //  tradingMovie
@@ -75,10 +77,20 @@ interface ApiServices {
     suspend fun getGenres(
         @Query("language") language: String = "en",
         @Query("api_key") apiKey: String = API_KEY
-    ): Genres
+    ): Response<GenresOfMovie>
 
 
-    ///////////////////////// DISCOVER FRAGMENT ///////////////////////////////////////////////////
+//    https://api.themoviedb.org/3/search/movie?query=god&include_adult=true&language=en-US&page=1&api_key=444a3900eac59a6892d47a7250a984f5
+    @GET("search/movie")
+    suspend fun searchMovie(
+    @Query("query") searchQuery:String,
+    @Query("include_adult") adult:Boolean = false,
+    @Query("language") language: String = "en",
+    @Query("api_key") apiKey: String = API_KEY
+    ):Response<Movies>
+
+
+    ///////////////////////// DISCOVER  ///////////////////////////////////////////////////
 
 
     //    https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&api_key=444a3900eac59a6892d47a7250a984f5
@@ -95,7 +107,7 @@ interface ApiServices {
     ): Movies
 
 
-    //////////////////////detail fragment ////////////////////////////////////////////////////////
+    //////////////////////Detail ////////////////////////////////////////////////////////
 
     //https://api.themoviedb.org/3/movie/280180?language=en-US&api_key=444a3900eac59a6892d47a7250a984f5
 
