@@ -1,6 +1,7 @@
 package com.github.ebrahimi16153.cinemahub.ui.screen.home
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -45,11 +46,11 @@ import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.ui.componnet.BannerItems
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GenreItem
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GridMovieItems
+import com.github.ebrahimi16153.cinemahub.utils.Route
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewModel) {
-
 
 
     ////////////////////getData////////////////////////////////////////////////////
@@ -74,7 +75,8 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
             topRateMovie = topRateMovie,
             popularMovie = popularMovie,
             upcomingMovie = upcomingMovie,
-            genres = genres)
+            genres = genres
+        )
 
 
     } else {
@@ -87,7 +89,8 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
             topRateMovie = topRateMovie,
             popularMovie = popularMovie,
             upcomingMovie = upcomingMovie,
-            genres = genres)
+            genres = genres
+        )
     }
 
 }
@@ -113,9 +116,11 @@ fun PortraitHome(
                 }
                 Column {
                     HomeTopBar()
-                    HorizontalGenresList(genres = genres) {
+                    HorizontalGenresList(
+                        genres = genres,
+                        onGenreClick = {itInt-> navHostController.navigate(Route.Discover.name + "/$itInt")
+                        })
 
-                    }
 
                 }
             }
@@ -162,9 +167,11 @@ fun LandscapeHome(
             }
             Column {
                 HomeTopBar()
-                HorizontalGenresList(genres = genres) {
-
-                }
+                HorizontalGenresList(
+                    genres = genres,
+                    onGenreClick = {itInt ->
+                        navHostController.navigate(Route.Discover.name + "/$itInt")
+                    })
 
             }
 
@@ -256,7 +263,6 @@ fun MovieSection(
 ) {
 
 
-
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -307,9 +313,9 @@ fun HorizontalMovieList(movies: List<Movie>) {
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Spacing between items
     ) {
 
-        itemsIndexed(items = movies ,key = { _, movie -> movie.id!! }) { index, itMovie ->
+        itemsIndexed(items = movies, key = { _, movie -> movie.id!! }) { index, itMovie ->
 
-                GridMovieItems(movie = itMovie)
+            GridMovieItems(movie = itMovie)
 
         }
 
@@ -318,16 +324,14 @@ fun HorizontalMovieList(movies: List<Movie>) {
 
 
 @Composable
-fun HorizontalGenresList(genres: List<Genre>, onGenreClick: (Int) -> Unit){
+fun HorizontalGenresList(genres: List<Genre>, onGenreClick: (Int) -> Unit) {
 
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Spacing between items
     ) {
-        itemsIndexed(genres  , key = {_,movie -> movie.id } ){_,genre ->
-            genre.name?.let {
-                GenreItem(text = it, onGenreClick = { onGenreClick(genre.id) })
-            }
+        itemsIndexed(genres, key = { _, movie -> movie.id }) { _, genre ->
+            GenreItem(isSelected = false, genre = genre, onGenreClick = { onGenreClick(it) })
         }
     }
 
