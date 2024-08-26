@@ -96,7 +96,7 @@ interface ApiServices {
     //    https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&api_key=444a3900eac59a6892d47a7250a984f5
     @GET("discover/movie")
     suspend fun getMovieByGenres(
-
+        @Query("include_adult") includeAdult: Boolean = false,
         @Query("include_video") includeVideo: Boolean = true,
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
@@ -104,7 +104,7 @@ interface ApiServices {
         @Query("with_genres") withGenres: String,
         @Query("api_key") apiKey: String = API_KEY
 
-    ): Movies
+    ): Response<Movies>
 
 
     //////////////////////Detail ////////////////////////////////////////////////////////

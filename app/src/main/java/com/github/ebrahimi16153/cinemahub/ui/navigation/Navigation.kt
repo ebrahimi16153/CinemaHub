@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import com.github.ebrahimi16153.cinemahub.ui.screen.discover.DiscoverScreen
 import com.github.ebrahimi16153.cinemahub.ui.screen.home.HomeScreen
 import com.github.ebrahimi16153.cinemahub.ui.screen.profile.ProfileScreen
@@ -43,11 +44,14 @@ fun Navigation(
         }
 
 
-        composable(Route.Discover.name+"/{genreID}"){backStackEntry ->
+        composable(Route.Discover.name+"/{genreID}/{genreName}"){backStackEntry ->
             val genreId = backStackEntry.arguments?.getString("genreID")?.toInt()?: -1
-            DiscoverScreen(navHostController = navHostController, genreID = genreId ,discoverViewModel = discoverViewModel)
+            val genreName = backStackEntry.arguments?.getString("genreName")?:""
+            DiscoverScreen(navHostController = navHostController, genreName = genreName,genreID = genreId ,discoverViewModel = discoverViewModel)
 
         }
+
+
 
     }
 

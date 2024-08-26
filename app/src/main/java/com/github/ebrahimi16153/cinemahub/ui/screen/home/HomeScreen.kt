@@ -118,7 +118,7 @@ fun PortraitHome(
                     HomeTopBar()
                     HorizontalGenresList(
                         genres = genres,
-                        onGenreClick = {itInt-> navHostController.navigate(Route.Discover.name + "/$itInt")
+                        onGenreClick = {itGenre-> navHostController.navigate(Route.Discover.name + "/${itGenre.id}/${itGenre.name}")
                         })
 
 
@@ -169,8 +169,8 @@ fun LandscapeHome(
                 HomeTopBar()
                 HorizontalGenresList(
                     genres = genres,
-                    onGenreClick = {itInt ->
-                        navHostController.navigate(Route.Discover.name + "/$itInt")
+                    onGenreClick = {itGenre ->
+                        navHostController.navigate(Route.Discover.name + "/${itGenre.id}/${itGenre.name}")
                     })
 
             }
@@ -324,7 +324,7 @@ fun HorizontalMovieList(movies: List<Movie>) {
 
 
 @Composable
-fun HorizontalGenresList(genres: List<Genre>, onGenreClick: (Int) -> Unit) {
+fun HorizontalGenresList(genres: List<Genre>, onGenreClick: (Genre) -> Unit) {
 
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),

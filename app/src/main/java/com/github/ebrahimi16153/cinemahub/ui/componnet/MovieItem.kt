@@ -19,11 +19,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.utils.IMAGE_URL
+import java.util.Locale
 
 @Composable
 fun GridMovieItems(movie: Movie, onMovieClick: (Int) -> Unit = {}) {
@@ -58,13 +60,16 @@ fun GridMovieItems(movie: Movie, onMovieClick: (Int) -> Unit = {}) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                val movieReleaseDate = movie.releaseDate?.split("-")
+                val averageRate = String.format(Locale.US, "%.1f", movie.voteAverage).toDouble()
+                val movieDetail = "$averageRate | ${movie.originalLanguage?.uppercase()} | ${movieReleaseDate?.get(0)}:${movieReleaseDate?.get(1)}"
                 Text(
-                    text = "9.3  2:57 US|EN",
+                    text = movieDetail,
                     maxLines = 1,
                     overflow = TextOverflow.Clip,
                     style = MaterialTheme.typography.labelMedium
                 )
-                movie.title?.let { Text(text = it, maxLines = 1, overflow = TextOverflow.Clip) }
+                movie.title?.let { Text(text = it, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center) }
 
             }
         }
