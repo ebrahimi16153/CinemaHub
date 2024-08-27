@@ -1,17 +1,13 @@
 package com.github.ebrahimi16153.cinemahub.data.server
 
-import android.media.tv.TvContract.Programs.Genres
 import com.github.ebrahimi16153.cinemahub.data.model.Credits
-import com.github.ebrahimi16153.cinemahub.data.model.Genre
 import com.github.ebrahimi16153.cinemahub.data.model.GenresOfMovie
 import com.github.ebrahimi16153.cinemahub.data.model.ImageCollection
-import com.github.ebrahimi16153.cinemahub.data.model.Movie
-import com.github.ebrahimi16153.cinemahub.data.model.MovieDetali
+import com.github.ebrahimi16153.cinemahub.data.model.MovieDetail
 import com.github.ebrahimi16153.cinemahub.data.model.Movies
 import com.github.ebrahimi16153.cinemahub.data.model.NowPlayingMovie
 import com.github.ebrahimi16153.cinemahub.data.model.Trailers
 import com.github.ebrahimi16153.cinemahub.utils.API_KEY
-import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -99,7 +95,7 @@ interface ApiServices {
         @Query("include_adult") includeAdult: Boolean = false,
         @Query("include_video") includeVideo: Boolean = true,
         @Query("language") language: String = "en-US",
-        @Query("page") page: Int = 1,
+        @Query("page") page: Int ,
         @Query("sort_by") sortBy: String = "popularity.desc",
         @Query("with_genres") withGenres: String,
         @Query("api_key") apiKey: String = API_KEY
@@ -117,7 +113,7 @@ interface ApiServices {
         @Query("language") language: String = "en-US",
         @Query("api_key") apiKey: String = API_KEY
 
-    ): MovieDetali
+    ): Response<MovieDetail>
 
     // https://api.themoviedb.org/3/collection/85861/images?&api_key=444a3900eac59a6892d47a7250a984f5
     @GET("collection/{collection_id}}/images")

@@ -2,7 +2,7 @@ package com.github.ebrahimi16153.cinemahub.data.model
 
 import com.google.gson.annotations.SerializedName
 
-data class MovieDetali(
+data class MovieDetail(
     @SerializedName("adult")
     val adult: Boolean?, // false
     @SerializedName("backdrop_path")

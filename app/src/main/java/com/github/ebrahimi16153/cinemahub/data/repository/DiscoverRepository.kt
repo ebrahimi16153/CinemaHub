@@ -1,7 +1,11 @@
 package com.github.ebrahimi16153.cinemahub.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.github.ebrahimi16153.cinemahub.data.model.Genre
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
+import com.github.ebrahimi16153.cinemahub.data.paging.DiscoverPaging
 import com.github.ebrahimi16153.cinemahub.data.server.ApiServices
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -23,17 +27,27 @@ class DiscoverRepository @Inject constructor(private val apiServices: ApiService
     }
 
     //Movies
-    suspend fun getMoviesByGenre(genreName:String):Flow<List<Movie>>{
+//    suspend fun getMoviesByGenre(genreName:String):Flow<List<Movie>>{
+//
+//        val response = apiServices.getMovieByGenres(withGenres = genreName)
+//
+//        return if (response.isSuccessful){
+//            flow {
+//                response.body()?.results?.let { emit(it) }
+//            }
+//        }else{
+//            flow { emptyList<List<Movie>>() }
+//        }
+//    }
 
-        val response = apiServices.getMovieByGenres(withGenres = genreName)
+    //Movies by Paging3
 
-        return if (response.isSuccessful){
-            flow {
-                response.body()?.results?.let { emit(it) }
-            }
-        }else{
-            flow { emptyList<List<Movie>>() }
-        }
+
+    fun getMoviesByGenre(genreName:String): Flow<PagingData<Movie>> {
+        return Pager(
+            config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = {DiscoverPaging(apiServices,genreName)}
+        ).flow
     }
 
 

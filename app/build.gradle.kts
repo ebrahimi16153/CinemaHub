@@ -109,6 +109,10 @@ dependencies {
     //image Loader Coil
     implementation("io.coil-kt:coil-compose:2.7.0")
 
+    // paging3
+    implementation("androidx.paging:paging-runtime-ktx:3.3.2")
+    implementation("androidx.paging:paging-compose:3.3.2")
+
 
 
 }
