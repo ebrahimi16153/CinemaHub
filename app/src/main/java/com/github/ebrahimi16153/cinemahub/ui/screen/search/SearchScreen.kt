@@ -22,9 +22,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.ebrahimi16153.cinemahub.R
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GridMovieItems
+import com.github.ebrahimi16153.cinemahub.utils.Route
 import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
 
 @Composable
@@ -32,7 +34,6 @@ fun SearchScreen(navHostController: NavHostController, searchViewModel: SearchVi
 
 
     val searchQuery by searchViewModel.searchQuery
-    val searchResponse  by searchViewModel.responseOfSearch.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top) {
            // searchNar
@@ -46,7 +47,7 @@ fun SearchScreen(navHostController: NavHostController, searchViewModel: SearchVi
                 })
 
            //MovieList
-          GridMovieList(movies = searchResponse)
+          GridMovieList(searchViewModel = searchViewModel, onMovieClick = {navHostController.navigate(Route.Details.name+"/$it")})
 
 
 
@@ -80,9 +81,11 @@ fun MySearchBar(
 }
 
 
-@Preview
+
 @Composable
-fun GridMovieList(movies:List<Movie> = emptyList(), onMovieClick:(Int) -> Unit = {}){
+fun GridMovieList(searchViewModel: SearchViewModel, onMovieClick:(Int) -> Unit = {}){
+
+    val searchResponse  = searchViewModel.responseOfSearch.collectAsLazyPagingItems()
 
     LazyVerticalStaggeredGrid(
         columns =StaggeredGridCells.Adaptive(130.dp),
@@ -92,10 +95,12 @@ fun GridMovieList(movies:List<Movie> = emptyList(), onMovieClick:(Int) -> Unit =
 
     ) {
 
-        itemsIndexed(items = movies){_,movie ->
+        items(count = searchResponse.itemCount){index ->
 
-            GridMovieItems(movie = movie){ movieID ->
-                // onClick
+            searchResponse[index]?.let {
+                GridMovieItems(movie = it){ movieID ->
+                    onMovieClick(movieID)
+                }
             }
 
 

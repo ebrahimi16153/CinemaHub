@@ -4,6 +4,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,8 +25,8 @@ class SearchViewModel @Inject constructor(private val searchRepository: SearchRe
     //////////////////////////////Search Query/////////////////////////////////
     val searchQuery: MutableState<String> = mutableStateOf("")
 
-    private val _responseOfSearch = MutableStateFlow<List<Movie>>(emptyList())
-    val responseOfSearch :StateFlow<List<Movie>> = _responseOfSearch
+    private val _responseOfSearch = MutableStateFlow<PagingData<Movie>>(PagingData.empty())
+    val responseOfSearch :StateFlow<PagingData<Movie>> = _responseOfSearch
 
     fun setSearchQuery(search: String) = viewModelScope.launch {
         searchQuery.value = search
@@ -32,7 +34,7 @@ class SearchViewModel @Inject constructor(private val searchRepository: SearchRe
 
 
     fun getResponseOfSearch(search: String) = viewModelScope.launch {
-        searchRepository.getSearchResponse(search).collectLatest { itMoves ->
+        searchRepository.getSearchResponse(search).cachedIn(viewModelScope).collectLatest { itMoves ->
             _responseOfSearch.value = itMoves
         }
     }

@@ -80,6 +80,7 @@ interface ApiServices {
     @GET("search/movie")
     suspend fun searchMovie(
     @Query("query") searchQuery:String,
+    @Query("page") page: Int,
     @Query("include_adult") adult:Boolean = false,
     @Query("language") language: String = "en",
     @Query("api_key") apiKey: String = API_KEY
