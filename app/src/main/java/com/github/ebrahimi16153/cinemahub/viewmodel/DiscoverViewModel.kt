@@ -1,5 +1,7 @@
 package com.github.ebrahimi16153.cinemahub.viewmodel
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -25,6 +27,13 @@ class DiscoverViewModel @Inject constructor(private val discoverRepository: Disc
     init {
         getGenres()
     }
+
+    val isGrid : MutableState<Boolean> = mutableStateOf(true)
+    fun setIsGrid(value:Boolean) = viewModelScope.launch {
+        isGrid.value = value
+    }
+
+
     private val _genres = MutableStateFlow<List<Genre>>(emptyList())
     val genres: StateFlow<List<Genre>> = _genres
 

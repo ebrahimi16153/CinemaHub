@@ -21,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -32,34 +31,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 import com.github.ebrahimi16153.cinemahub.R
 import com.github.ebrahimi16153.cinemahub.data.model.Genre
+import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GenreItem
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GridMovieItems
 import com.github.ebrahimi16153.cinemahub.ui.componnet.RowMovieItems
 import com.github.ebrahimi16153.cinemahub.utils.MyExtension.toGenre
 import com.github.ebrahimi16153.cinemahub.utils.Route
 import com.github.ebrahimi16153.cinemahub.viewmodel.DiscoverViewModel
+import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
 
 @Composable
 fun DiscoverScreen(
     navHostController: NavHostController,
     genreID: Int,
-    discoverViewModel: DiscoverViewModel,
-    genreName: String
+    genreName: String,
+    isGrid: Boolean,
+    movies: LazyPagingItems<Movie>,
+    genres: List<Genre>,
+    onGridClick: () -> Unit,
+    onGenreClick: (Genre) -> Unit,
+    discoverViewModel: DiscoverViewModel
 ) {
 
 
-    val genres by discoverViewModel.genres.collectAsState()
     var currentGenreID by remember { mutableIntStateOf(genreID) }
     var currentGenreName by remember { mutableStateOf(genreName) }
-    var isGrid by remember{ mutableStateOf(true) }
 
     //GET movies
-    discoverViewModel.getMoviesByGenre(currentGenreID.toString())
-
-
     Column(modifier = Modifier.fillMaxWidth()) {
         //navigation and genres
         Column(modifier = Modifier
@@ -75,7 +76,7 @@ fun DiscoverScreen(
                    Text(text = currentGenreName)
                    Spacer(modifier = Modifier.height(10.dp))
                }
-                 IconButton(onClick = { isGrid = !isGrid }) {
+                 IconButton(onClick = { onGridClick() }) {
                      Icon(imageVector = Icons.Rounded.Apps, contentDescription = "")
                  }
              }
@@ -88,21 +89,21 @@ fun DiscoverScreen(
                     currentGenre = currentGenreID,
                     genres = genres,
                     onGenreClick = { itGenre ->
+                       onGenreClick(itGenre)
                         currentGenreID = itGenre.id
                         currentGenreName = itGenre.name.toString()
-                        discoverViewModel.getMoviesByGenre(itGenre.id.toString())
                     })
             }
 
             //MovieList
             if (isGrid){
 
-                DiscoverGridMovieList(discoverViewModel,onMovieClick = {itMovieId ->
+                DiscoverGridMovieList(movies= movies,onMovieClick = {itMovieId ->
                     navHostController.navigate(Route.Details.name+"/$itMovieId")
                 })
             }else{
                 
-                DiscoverRowMovieList(discoverViewModel = discoverViewModel, onMovieClick = { itMovieId ->
+                DiscoverRowMovieList(movies = movies, onMovieClick = { itMovieId ->
                     navHostController.navigate(Route.Details.name+"/$itMovieId")
                 
             })
@@ -139,9 +140,11 @@ fun GenresList(currentGenre: Int, genres: List<Genre>, onGenreClick: (Genre) -> 
 }
 
 @Composable
-fun DiscoverGridMovieList(discoverViewModel: DiscoverViewModel, onMovieClick:(Int) -> Unit = {}){
+fun DiscoverGridMovieList(
+    onMovieClick: (Int) -> Unit = {},
+    movies: LazyPagingItems<Movie>
+){
 
-    val movies = discoverViewModel.moviesByGenre.collectAsLazyPagingItems()
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Adaptive(130.dp),
@@ -166,9 +169,8 @@ fun DiscoverGridMovieList(discoverViewModel: DiscoverViewModel, onMovieClick:(In
 
 
 @Composable
-fun DiscoverRowMovieList(discoverViewModel: DiscoverViewModel, onMovieClick:(Int) -> Unit = {}){
+fun DiscoverRowMovieList(movies:LazyPagingItems<Movie>, onMovieClick:(Int) -> Unit = {}){
 
-    val movies = discoverViewModel.moviesByGenre.collectAsLazyPagingItems()
 
    LazyColumn(
         contentPadding = PaddingValues(vertical = 16.dp),
