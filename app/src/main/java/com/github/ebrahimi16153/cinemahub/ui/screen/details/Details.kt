@@ -1,29 +1,58 @@
 package com.github.ebrahimi16153.cinemahub.ui.screen.details
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.github.ebrahimi16153.cinemahub.data.model.ImageCollection
 import com.github.ebrahimi16153.cinemahub.utils.IMAGE_URL
+import com.github.ebrahimi16153.cinemahub.viewmodel.DetailsViewModel
 
 @Composable
-fun Details(movieID: Int) {
+fun Details(movieID: Int, detailsViewModel: DetailsViewModel, navHostController: NavHostController) {
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-        Text(text = "$movieID")
+    if (movieID != -1){
+        detailsViewModel.getMovieDetails(movieID)
     }
 
+    val movieDetail = detailsViewModel.movie.collectAsState()
+    val collectionID = movieDetail.value?.belongsToCollection?.id
 
-    MovieBanner()
+     detailsViewModel.getCollectionImages(collectionID?: -1)
+
+    val posters by detailsViewModel.posters.collectAsState()
+
+
+
+
+
+//    if (!navHostController.currentDestination?.route.equals("details/$movieID") && posters.isEmpty()){
+//          detailsViewModel.setPoster()
+//    }
+
+    LazyColumn(verticalArrangement = Arrangement.Top) {
+        //Banner
+        item {
+            if (posters.isEmpty()){
+                Text(text = "EMPTY POSTER")
+            }else{
+                MovieBanner(posters = posters)
+
+            }
+        }
+    }
+
 
 }
 

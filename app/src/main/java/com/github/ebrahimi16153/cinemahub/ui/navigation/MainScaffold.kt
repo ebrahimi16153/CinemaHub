@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyNavigationBar
 import com.github.ebrahimi16153.cinemahub.utils.Route
+import com.github.ebrahimi16153.cinemahub.viewmodel.DetailsViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.DiscoverViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
@@ -20,7 +21,8 @@ fun MainScaffold(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
-    discoverViewModel: DiscoverViewModel
+    discoverViewModel: DiscoverViewModel,
+    detailsViewModel: DetailsViewModel
 ) {
 
     Scaffold(
@@ -45,7 +47,8 @@ fun MainScaffold(
                 navHostController = navController,
                 homeViewModel = homeViewModel,
                 searchViewModel = searchViewModel,
-                discoverViewModel = discoverViewModel
+                discoverViewModel = discoverViewModel,
+                detailsViewModel = detailsViewModel
             )
 
         }

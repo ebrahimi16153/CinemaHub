@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.github.ebrahimi16153.cinemahub.ui.navigation.MainScaffold
 import com.github.ebrahimi16153.cinemahub.ui.theme.CinemaHubTheme
+import com.github.ebrahimi16153.cinemahub.viewmodel.DetailsViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.DiscoverViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
@@ -21,6 +22,7 @@ class MainActivity : ComponentActivity() {
     private val homeViewModel: HomeViewModel by viewModels()
     private val searchViewMode: SearchViewModel by viewModels()
     private val discoverViewModel: DiscoverViewModel by viewModels()
+    private val detailsViewModel: DetailsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +33,8 @@ class MainActivity : ComponentActivity() {
                 navHostController = navHostController,
                 homeViewModel = homeViewModel,
                 searchViewModel = searchViewMode,
-                discoverViewModel = discoverViewModel
+                discoverViewModel = discoverViewModel,
+                detailsViewModel = detailsViewModel
             )
 
         }
@@ -43,13 +46,15 @@ fun CinemaHub(
     navHostController: NavHostController,
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
-    discoverViewModel: DiscoverViewModel
+    discoverViewModel: DiscoverViewModel,
+    detailsViewModel: DetailsViewModel
 ) {
     CinemaHubTheme {
         MainScaffold(
             navController = navHostController,
             homeViewModel = homeViewModel,
             searchViewModel = searchViewModel,
-            discoverViewModel = discoverViewModel)
+            discoverViewModel = discoverViewModel,
+            detailsViewModel = detailsViewModel)
     }
 }

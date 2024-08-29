@@ -18,6 +18,7 @@ import com.github.ebrahimi16153.cinemahub.ui.screen.profile.ProfileScreen
 import com.github.ebrahimi16153.cinemahub.ui.screen.saved.SaveScreen
 import com.github.ebrahimi16153.cinemahub.ui.screen.search.SearchScreen
 import com.github.ebrahimi16153.cinemahub.utils.Route
+import com.github.ebrahimi16153.cinemahub.viewmodel.DetailsViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.DiscoverViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
@@ -27,7 +28,8 @@ fun Navigation(
     navHostController: NavHostController,
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
-    discoverViewModel: DiscoverViewModel
+    discoverViewModel: DiscoverViewModel,
+    detailsViewModel: DetailsViewModel
 ) {
 
     ////////////////////////DISCOVER VALUES/////////////////////////////////////////////////////////
@@ -100,7 +102,7 @@ fun Navigation(
 
         composable(Route.Details.name + "/{movie_id}") { backStackEntry ->
             val movieID = backStackEntry.arguments?.getString("movie_id")?.toInt() ?: -1
-            Details(movieID = movieID)
+            Details(navHostController = navHostController,detailsViewModel = detailsViewModel, movieID = movieID)
 
         }
 

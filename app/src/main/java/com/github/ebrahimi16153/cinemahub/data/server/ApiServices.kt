@@ -122,7 +122,7 @@ interface ApiServices {
         @Path("collection_id") collectionID: Int,
         @Query("api_key") apiKey: String = API_KEY
 
-    ): ImageCollection
+    ): Response<ImageCollection>
 
     //    https://api.themoviedb.org/3/movie/748783/credits?language=en-US&api_key=444a3900eac59a6892d47a7250a984f5
     @GET("movie/{movie_id}/credits")

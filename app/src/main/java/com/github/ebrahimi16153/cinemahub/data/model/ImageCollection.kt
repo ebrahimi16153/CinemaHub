@@ -8,7 +8,7 @@ data class ImageCollection(
     @SerializedName("id")
     val id: Int?, // 85861
     @SerializedName("posters")
-    val posters: List<Poster?>?
+    val posters: List<Poster>
 ) {
     data class Backdrop(
         @SerializedName("aspect_ratio")
