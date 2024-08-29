@@ -1,12 +1,11 @@
 package com.github.ebrahimi16153.cinemahub.viewmodel
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.ebrahimi16153.cinemahub.data.model.ImageCollection
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetail
 import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
+import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,22 +28,29 @@ class DetailsViewModel @Inject constructor(private val detailsRepository: Detail
     }
 
 
-    private val _posters = MutableStateFlow<List<ImageCollection.Poster>>(emptyList())
-    val posters: StateFlow<List<ImageCollection.Poster>> = _posters
+    private val _posters = MutableStateFlow<Wrapper<List<ImageCollection.Poster>>>(Wrapper.Idle)
+    val posters: StateFlow<Wrapper<List<ImageCollection.Poster>>> = _posters
 
 
+    fun getCollectionImages(collectionID: Int) = viewModelScope.launch(Dispatchers.IO) {
+        _posters.value = Wrapper.Loading
 
-    fun getCollectionImages(collectionID: Int) = viewModelScope.launch {
-        detailsRepository.getCollectionImages(collectionID)
-            .collectLatest { itCollection ->
+        try {
+            detailsRepository.getCollectionImages(collectionID)
+                .collect{ itCollection ->
 
-                if (itCollection != null) {
-                    _posters.value = itCollection.posters
-                    return@collectLatest
+                    if (itCollection != null && itCollection.posters.isNotEmpty()) {
+                        _posters.value = Wrapper.Success(data = itCollection.posters)
+                    }else{
+                        _posters.value = Wrapper.Error("No Data Found")
+                    }
+
                 }
-                _posters.value = emptyList()
 
-            }
+        } catch (e: Exception) {
+            _posters.value = Wrapper.Error(e.message.toString())
+        }
+
     }
 
 
