@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
 import com.github.ebrahimi16153.cinemahub.ui.screen.details.Details
 import com.github.ebrahimi16153.cinemahub.ui.screen.discover.DiscoverScreen
 import com.github.ebrahimi16153.cinemahub.ui.screen.home.HomeScreen
@@ -29,7 +30,8 @@ fun Navigation(
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
     discoverViewModel: DiscoverViewModel,
-    detailsViewModel: DetailsViewModel
+    detailsViewModel: DetailsViewModel,
+    detailsRepository: DetailsRepository
 ) {
 
     ////////////////////////DISCOVER VALUES/////////////////////////////////////////////////////////
@@ -79,7 +81,7 @@ fun Navigation(
 
 
         composable(Route.Discover.name + "/{genreID}/{genreName}") { backStackEntry ->
-          genreId = backStackEntry.arguments?.getString("genreID") ?: "-1"
+            genreId = backStackEntry.arguments?.getString("genreID") ?: "-1"
             genreName = backStackEntry.arguments?.getString("genreName") ?: ""
             DiscoverScreen(
                 discoverViewModel = discoverViewModel,
@@ -102,7 +104,11 @@ fun Navigation(
 
         composable(Route.Details.name + "/{movie_id}") { backStackEntry ->
             val movieID = backStackEntry.arguments?.getString("movie_id")?.toInt() ?: -1
-            Details(navHostController = navHostController,detailsViewModel = detailsViewModel, movieID = movieID)
+            Details(
+                navHostController = navHostController,
+                movieID = movieID,
+                detailsRepository = detailsRepository
+            )
 
         }
 

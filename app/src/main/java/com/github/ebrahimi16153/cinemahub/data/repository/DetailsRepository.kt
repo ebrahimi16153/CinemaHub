@@ -11,7 +11,8 @@ class DetailsRepository @Inject constructor(private val apiServices: ApiServices
     suspend fun getMovieDetailsByMovieID(movieID: Int) =
         flow<MovieDetail?> {
             if (apiServices.getMovieDetailByID(movieID).isSuccessful
-                && apiServices.getMovieDetailByID(movieID).body() != null) {
+                && apiServices.getMovieDetailByID(movieID).body() != null
+            ) {
                 emit(apiServices.getMovieDetailByID(movieID).body())
             } else {
                 emit(null)
@@ -22,11 +23,13 @@ class DetailsRepository @Inject constructor(private val apiServices: ApiServices
 
     suspend fun getCollectionImages(collectionID: Int) =
         flow<ImageCollection?> {
-            if(apiServices.getCollectionImages(collectionID).isSuccessful && apiServices.getCollectionImages(collectionID).body() != null){
-                emit(apiServices.getCollectionImages(collectionID).body()!!)
-            }else{
-                emit(null)
-            }
+                if (apiServices.getCollectionImages(collectionID).isSuccessful && apiServices.getCollectionImages(collectionID).body()!!.posters.isNotEmpty()) {
+
+                    emit(apiServices.getCollectionImages(collectionID).body()!!)
+                }else{
+                    emit(null)
+                }
+
         }
 
 
