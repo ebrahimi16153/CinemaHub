@@ -2,22 +2,30 @@ package com.github.ebrahimi16153.cinemahub.ui.screen.details
 
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBackIosNew
+import androidx.compose.material.icons.rounded.Bookmark
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.github.ebrahimi16153.cinemahub.data.model.ImageCollection
@@ -37,10 +45,8 @@ fun Details(
 
 
     /**
-     *
      * Detail screen must update eveyTime loaded for this we don't use from viewModel
      * viewModel cashed every thing until new data replaced whit old data
-     *
      * for this we use from repository directly
      *
      */
@@ -51,10 +57,6 @@ fun Details(
     }
     val moviePoster: MutableState<Wrapper<List<ImageCollection.Poster>>> = remember {
         mutableStateOf(Wrapper.Loading)
-    }
-
-    var isPosterAvailable by remember {
-        mutableStateOf(false)
     }
 
 
@@ -70,14 +72,11 @@ fun Details(
             }.collect { itCollection ->
 
                 if (itCollection != null) {
-                    moviePoster.value = Wrapper.Success(data = itCollection.posters?: emptyList())
+                    moviePoster.value = Wrapper.Success(data = itCollection.posters)
                 }else{
                     moviePoster.value = Wrapper.Success(data = emptyList())
                 }
-
-
             }
-
     }
 
 
@@ -92,14 +91,16 @@ fun Details(
         }
 
         is Wrapper.Success -> {
-            LazyColumn {
-                item {
-                    MovieBanner(
-                        posters = (moviePoster.value as Wrapper.Success<List<ImageCollection.Poster>>).data,
-                        movieDetail = movieDetail.value!!
-                    )
-                }
+
+
+            movieDetail.value?.let {
+                DetailsOrientation(
+                    movieDetail = it,
+                    posters = (moviePoster.value as Wrapper.Success).data,
+                    navHostController = navHostController
+                )
             }
+
         }
     }
 
@@ -108,7 +109,6 @@ fun Details(
 
 @Composable
 fun DetailsOrientation(
-    isPoserAvailable: Boolean,
     movieDetail: MovieDetail,
     posters: List<ImageCollection.Poster?>,
     navHostController: NavHostController
@@ -118,64 +118,104 @@ fun DetailsOrientation(
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     if (isLandscape) {
-        DetailsPortrait(
-            isPoserAvailable = isPoserAvailable,
+
+        DetailsLandScape(
             movieDetail = movieDetail,
             posters = posters,
-            navHostController = navHostController
+            navHostController = navHostController,
+            onSaveClick = { itPosters, itMovieDetail ->
+
+            }
+
         )
     } else {
-        DetailsLandScape(
-            isPoserAvailable = isPoserAvailable,
+        DetailsPortrait(
             movieDetail = movieDetail,
             posters = posters,
             navHostController = navHostController
         )
+
     }
 
 }
 
 @Composable
 fun DetailsPortrait(
-    isPoserAvailable: Boolean,
     movieDetail: MovieDetail,
     posters: List<ImageCollection.Poster?>,
     navHostController: NavHostController
 ) {
+    LazyColumn {
+        item {
+            MovieBanner(
+                modifier = Modifier.fillMaxWidth(),
+                posters = posters,
+                movieDetail = movieDetail,
+                onNavClick = { navHostController.navigateUp() },
+                onSaveClick = { _, _ -> }
+
+            )
+        }
+    }
+
+
 }
 
 @Composable
 fun DetailsLandScape(
-    isPoserAvailable: Boolean,
     movieDetail: MovieDetail,
     posters: List<ImageCollection.Poster?>,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    onSaveClick: (List<ImageCollection.Poster?>, MovieDetail) -> Unit
 ) {
 
+    Row(modifier = Modifier.fillMaxSize()){
+        Box(modifier = Modifier.fillMaxWidth(0.4f).fillMaxHeight(), contentAlignment = Alignment.Center) {
+            MovieBanner(
+                modifier = Modifier.fillMaxSize(),
+                posters = posters,
+                movieDetail = movieDetail,
+                onNavClick = { navHostController.navigateUp() },
+                onSaveClick = {itPosters,itMovieDetail -> onSaveClick(itPosters,itMovieDetail) })
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MovieBanner(
-    posters: List<ImageCollection.Poster>,
+    modifier: Modifier = Modifier,
+    posters: List<ImageCollection.Poster?>,
     movieDetail: MovieDetail,
-    onPosterClick: (String) -> Unit = {}
+    onSaveClick: (List<ImageCollection.Poster?>,MovieDetail) -> Unit = { _,_ ->},
+    onNavClick:() -> Unit
 ) {
 
-    if (posters.isNotEmpty()) {
-        val state = rememberPagerState(pageCount = { posters.size })
-        HorizontalPager(modifier = Modifier.fillMaxWidth(), state = state) { itIndex ->
-            PosterItems(posters[itIndex])
+    Box(modifier = modifier, Alignment.TopCenter) {
+        // poster
+        if (posters.isNotEmpty()) {
+            val state = rememberPagerState(pageCount = { posters.size })
+            HorizontalPager(modifier = Modifier.fillMaxWidth(), state = state) { itIndex ->
+                posters[itIndex]?.let { PosterItems(it) }
+            }
+        } else {
+            AsyncImage(
+                modifier = Modifier.fillMaxWidth(),
+                model = IMAGE_URL + movieDetail.posterPath,
+                contentDescription = ""
+            )
         }
-    } else {
-        AsyncImage(
-            modifier = Modifier.fillMaxWidth(),
-            model = IMAGE_URL + movieDetail.posterPath,
-            contentDescription = ""
-        )
+        //navigation & Save
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            //navigation
+            FilledIconButton(onClick = { onNavClick() }) {
+                Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = "" ) }
+            //save
+            FilledIconButton(onClick = { onSaveClick(posters,movieDetail) }) {
+                Icon(imageVector = Icons.Rounded.Bookmark, contentDescription = "" )
+            }
+        }
     }
-
-
 }
 
 @Composable
@@ -183,7 +223,8 @@ fun PosterItems(poster: ImageCollection.Poster) {
     AsyncImage(
         modifier = Modifier.fillMaxWidth(),
         model = IMAGE_URL + poster.filePath,
-        contentDescription = ""
+        contentDescription = "",
+        contentScale = ContentScale.Crop
     )
 }
 

@@ -41,7 +41,6 @@ class MainActivity : ComponentActivity() {
                 detailsViewModel = detailsViewModel,
                 detailsRepository = detailsRepository
             )
-
         }
     }
 }

@@ -72,7 +72,6 @@ fun BannerItems(isLandscape: Boolean, movie: Movie, onBannerClick: (Int) -> Unit
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
                     movie.title?.let { Text(text = it) }
                     Button(onClick = { movie.id?.let { onBannerClick(it) } }) {
                         Text(text = stringResource(id = R.string.watch_now))
@@ -80,14 +79,7 @@ fun BannerItems(isLandscape: Boolean, movie: Movie, onBannerClick: (Int) -> Unit
                     Text(text = stringResource(id = R.string.exclusive))
                     Spacer(modifier = Modifier.height(20.dp))
                 }
-
             }
-
-
         }
-
-
     }
-
-
 }

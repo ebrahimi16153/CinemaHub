@@ -162,8 +162,8 @@ fun LandscapeHome(
                 .fillMaxWidth(0.4f), contentAlignment = Alignment.TopCenter
         ) {
 
-            MyBanner(isLandscape = true, movies = mainBannerMovies) {
-                //todo onClick
+            MyBanner(isLandscape = true, movies = mainBannerMovies) { itMovieId ->
+                navHostController.navigate(Route.Details.name+"/$itMovieId")
             }
             Column {
                 HomeTopBar()
@@ -172,10 +172,7 @@ fun LandscapeHome(
                     onGenreClick = {itGenre ->
                         navHostController.navigate(Route.Discover.name + "/${itGenre.id}/${itGenre.name}")
                     })
-
             }
-
-
         }
         // movie section
         LazyColumn(
@@ -191,13 +188,9 @@ fun LandscapeHome(
                     upcomingMovie = upcomingMovie,
                     navHostController = navHostController
                 )
-
             }
         }
-
     }
-
-
 }
 
 
@@ -233,8 +226,6 @@ fun HomeTopBar() {
             }
 
         })
-
-
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -243,14 +234,11 @@ fun MyBanner(isLandscape: Boolean, movies: List<Movie>, onBannerClick: (Int) -> 
 
     val state = rememberPagerState(pageCount = { movies.size })
 
-
     HorizontalPager(state = state) { index ->
 
         BannerItems(isLandscape, movies[index], onBannerClick = onBannerClick)
 
     }
-
-
 }
 
 @Composable
@@ -261,7 +249,6 @@ fun MovieSection(
     popularMovie: List<Movie>,
     upcomingMovie: List<Movie>
 ) {
-
 
     Column(
         modifier = Modifier
@@ -302,8 +289,6 @@ fun MovieSection(
         HorizontalMovieList(movies = upcomingMovie)
 
     }
-
-
 }
 
 @Composable
@@ -318,7 +303,6 @@ fun HorizontalMovieList(movies: List<Movie>) {
             GridMovieItems(movie = itMovie)
 
         }
-
     }
 }
 
