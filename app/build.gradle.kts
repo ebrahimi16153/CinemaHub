@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+//    id ("org.jetbrains.kotlin.plugin.serialization")
 
 }
 
@@ -92,16 +93,16 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
 
     //lifeCycle
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
-    ksp ("androidx.lifecycle:lifecycle-common:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
+    ksp("androidx.lifecycle:lifecycle-common:2.8.4")
 
     //viewModels()
-    implementation ("androidx.fragment:fragment-ktx:1.8.2")
-    implementation ("androidx.fragment:fragment-ktx:1.8.2")
+    implementation("androidx.fragment:fragment-ktx:1.8.2")
+    implementation("androidx.fragment:fragment-ktx:1.8.2")
 
     //navigation
-    implementation ("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     //icons
     implementation("androidx.compose.material:material-icons-extended")
@@ -113,6 +114,10 @@ dependencies {
     implementation("androidx.paging:paging-runtime-ktx:3.3.2")
     implementation("androidx.paging:paging-compose:3.3.2")
 
+// new way for navigation
+//implementation ("androidx.navigation:navigation-compose:2.8.0-rc01")
+//Kotlin serialization for new navigation
+//implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
 
 }
