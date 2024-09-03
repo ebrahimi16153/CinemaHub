@@ -78,7 +78,6 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
             genres = genres
         )
 
-
     } else {
 
         // portrait design
@@ -92,7 +91,6 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
             genres = genres
         )
     }
-
 }
 
 
@@ -118,10 +116,9 @@ fun PortraitHome(
                     HomeTopBar()
                     HorizontalGenresList(
                         genres = genres,
-                        onGenreClick = {itGenre-> navHostController.navigate(Route.Discover.name + "/${itGenre.id}/${itGenre.name}")
+                        onGenreClick = { itGenre ->
+                            navHostController.navigate(Route.Discover.name + "/${itGenre.id}/${itGenre.name}")
                         })
-
-
                 }
             }
         }
@@ -163,13 +160,13 @@ fun LandscapeHome(
         ) {
 
             MyBanner(isLandscape = true, movies = mainBannerMovies) { itMovieId ->
-                navHostController.navigate(Route.Details.name+"/$itMovieId")
+                navHostController.navigate(Route.Details.name + "/$itMovieId")
             }
             Column {
                 HomeTopBar()
                 HorizontalGenresList(
                     genres = genres,
-                    onGenreClick = {itGenre ->
+                    onGenreClick = { itGenre ->
                         navHostController.navigate(Route.Discover.name + "/${itGenre.id}/${itGenre.name}")
                     })
             }
@@ -261,7 +258,9 @@ fun MovieSection(
             text = stringResource(id = R.string.playing_now)
         )
         Spacer(modifier = Modifier.height(10.dp))
-        HorizontalMovieList(movies = nowPlayingMovieList)
+        HorizontalMovieList(
+            movies = nowPlayingMovieList,
+            onMovieClick = { navHostController.navigate(Route.Details.name+ "/$it")  })
         // topRate
         Spacer(modifier = Modifier.height(10.dp))
         Text(
@@ -269,7 +268,9 @@ fun MovieSection(
             text = stringResource(id = R.string.top_movies)
         )
         Spacer(modifier = Modifier.height(10.dp))
-        HorizontalMovieList(movies = topRateMovie)
+        HorizontalMovieList(
+            movies = topRateMovie,
+            onMovieClick = { navHostController.navigate(Route.Details.name+ "/$it")  })
         // popular
         Spacer(modifier = Modifier.height(10.dp))
         Text(
@@ -277,7 +278,9 @@ fun MovieSection(
             text = stringResource(id = R.string.popular)
         )
         Spacer(modifier = Modifier.height(10.dp))
-        HorizontalMovieList(movies = popularMovie)
+        HorizontalMovieList(
+            movies = popularMovie,
+            onMovieClick = { navHostController.navigate(Route.Details.name+ "/$it")  })
 
         // upComing
         Spacer(modifier = Modifier.height(10.dp))
@@ -286,21 +289,23 @@ fun MovieSection(
             text = stringResource(id = R.string.coming_soon)
         )
         Spacer(modifier = Modifier.height(10.dp))
-        HorizontalMovieList(movies = upcomingMovie)
+        HorizontalMovieList(
+            movies = upcomingMovie,
+            onMovieClick = { navHostController.navigate(Route.Details.name+ "/$it")  })
 
     }
 }
 
 @Composable
-fun HorizontalMovieList(movies: List<Movie>) {
+fun HorizontalMovieList(movies: List<Movie>, onMovieClick: (Int) -> Unit) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp), // Consistent padding
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Spacing between items
     ) {
 
-        itemsIndexed(items = movies, key = { _, movie -> movie.id!! }) { index, itMovie ->
+        itemsIndexed(items = movies, key = { _, movie -> movie.id!! }) { _, itMovie ->
 
-            GridMovieItems(movie = itMovie)
+            GridMovieItems(movie = itMovie, onMovieClick = { onMovieClick(itMovie.id!!) })
 
         }
     }
