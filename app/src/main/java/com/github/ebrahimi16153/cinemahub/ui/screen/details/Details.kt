@@ -30,6 +30,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.github.ebrahimi16153.cinemahub.data.model.ImageCollection
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetail
+import com.github.ebrahimi16153.cinemahub.data.model.MovieImages
 import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
 import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyCircularProgress
@@ -55,7 +56,8 @@ fun Details(
     val movieDetail: MutableState<MovieDetail?> = remember {
         mutableStateOf(null)
     }
-    val moviePoster: MutableState<Wrapper<List<ImageCollection.Poster>>> = remember {
+
+    val movieImages: MutableState<Wrapper<List<MovieImages.Poster>>> = remember {
         mutableStateOf(Wrapper.Loading)
     }
 
@@ -65,24 +67,17 @@ fun Details(
         detailsRepository.getMovieDetailsByMovieID(movieID).collect { itMovieDetail ->
             movieDetail.value = itMovieDetail
         }
-        val posterID = movieDetail.value?.belongsToCollection?.id ?: -1
-
-            detailsRepository.getCollectionImages(posterID).catch {
-                moviePoster.value = Wrapper.Error(message = it.message.toString())
-            }.collect { itCollection ->
-
-                if (itCollection != null) {
-                    moviePoster.value = Wrapper.Success(data = itCollection.posters)
-                }else{
-                    moviePoster.value = Wrapper.Success(data = emptyList())
-                }
+        detailsRepository.getMovieImages(movieID = movieID).collect{ itImages ->
+            if (itImages != null) {
+                movieImages.value = Wrapper.Success(data = itImages.posters)
             }
+        }
     }
 
 
-    when (moviePoster.value) {
+    when (movieImages.value) {
         is Wrapper.Error -> {
-            Text(text = (moviePoster.value as Wrapper.Error).message)
+            Text(text = (movieImages.value as Wrapper.Error).message)
         }
 
         Wrapper.Idle -> {}
@@ -96,7 +91,7 @@ fun Details(
             movieDetail.value?.let {
                 DetailsOrientation(
                     movieDetail = it,
-                    posters = (moviePoster.value as Wrapper.Success).data,
+                    posters = (movieImages.value as Wrapper.Success).data,
                     navHostController = navHostController
                 )
             }
@@ -110,7 +105,7 @@ fun Details(
 @Composable
 fun DetailsOrientation(
     movieDetail: MovieDetail,
-    posters: List<ImageCollection.Poster?>,
+    posters: List<MovieImages.Poster?>,
     navHostController: NavHostController
 ) {
 
@@ -142,7 +137,7 @@ fun DetailsOrientation(
 @Composable
 fun DetailsPortrait(
     movieDetail: MovieDetail,
-    posters: List<ImageCollection.Poster?>,
+    posters: List<MovieImages.Poster?>,
     navHostController: NavHostController
 ) {
     LazyColumn {
@@ -164,9 +159,9 @@ fun DetailsPortrait(
 @Composable
 fun DetailsLandScape(
     movieDetail: MovieDetail,
-    posters: List<ImageCollection.Poster?>,
+    posters: List<MovieImages.Poster?>,
     navHostController: NavHostController,
-    onSaveClick: (List<ImageCollection.Poster?>, MovieDetail) -> Unit
+    onSaveClick: (List<MovieImages.Poster?>, MovieDetail) -> Unit
 ) {
 
     Row(modifier = Modifier.fillMaxSize()){
@@ -185,9 +180,9 @@ fun DetailsLandScape(
 @Composable
 fun MovieBanner(
     modifier: Modifier = Modifier,
-    posters: List<ImageCollection.Poster?>,
+    posters: List<MovieImages.Poster?>,
     movieDetail: MovieDetail,
-    onSaveClick: (List<ImageCollection.Poster?>,MovieDetail) -> Unit = { _,_ ->},
+    onSaveClick: (List<MovieImages.Poster?>,MovieDetail) -> Unit = { _,_ ->},
     onNavClick:() -> Unit
 ) {
 
@@ -202,7 +197,8 @@ fun MovieBanner(
             AsyncImage(
                 modifier = Modifier.fillMaxWidth(),
                 model = IMAGE_URL + movieDetail.posterPath,
-                contentDescription = ""
+                contentDescription = "",
+                contentScale = ContentScale.Crop
             )
         }
         //navigation & Save
@@ -219,7 +215,7 @@ fun MovieBanner(
 }
 
 @Composable
-fun PosterItems(poster: ImageCollection.Poster) {
+fun PosterItems(poster: MovieImages.Poster) {
     AsyncImage(
         modifier = Modifier.fillMaxWidth(),
         model = IMAGE_URL + poster.filePath,

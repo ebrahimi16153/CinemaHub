@@ -4,6 +4,7 @@ import com.github.ebrahimi16153.cinemahub.data.model.Credits
 import com.github.ebrahimi16153.cinemahub.data.model.GenresOfMovie
 import com.github.ebrahimi16153.cinemahub.data.model.ImageCollection
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetail
+import com.github.ebrahimi16153.cinemahub.data.model.MovieImages
 import com.github.ebrahimi16153.cinemahub.data.model.Movies
 import com.github.ebrahimi16153.cinemahub.data.model.NowPlayingMovie
 import com.github.ebrahimi16153.cinemahub.data.model.Trailers
@@ -116,13 +117,16 @@ interface ApiServices {
 
     ): Response<MovieDetail>
 
-    // https://api.themoviedb.org/3/collection/85861/images?&api_key=444a3900eac59a6892d47a7250a984f5
-    @GET("collection/{collection_id}}/images")
-    suspend fun getCollectionImages(
-        @Path("collection_id") collectionID: Int,
-        @Query("api_key") apiKey: String = API_KEY
 
-    ): Response<ImageCollection>
+//    https://api.themoviedb.org/3/movie/917496/images?api_key=444a3900eac59a6892d47a7250a984f5&language=en
+
+    @GET("movie/{movie_id}/images")
+    suspend fun getMovieImages(
+        @Path("movie_id") movieID: Int,
+        @Query("language") language: String = "en",
+        @Query("api_key") apiKey: String = API_KEY
+    ):Response<MovieImages>
+
 
     //    https://api.themoviedb.org/3/movie/748783/credits?language=en-US&api_key=444a3900eac59a6892d47a7250a984f5
     @GET("movie/{movie_id}/credits")
