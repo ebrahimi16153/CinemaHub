@@ -6,9 +6,9 @@ data class Trailers(
     @SerializedName("id")
     val id: Int?,
     @SerializedName("results")
-    val results: List<Result>
+    val results: List<Trailer>
 ) {
-    data class Result(
+    data class Trailer(
         @SerializedName("id")
         val id: String?,
         @SerializedName("iso_3166_1")

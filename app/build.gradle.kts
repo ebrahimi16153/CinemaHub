@@ -114,6 +114,10 @@ dependencies {
     implementation("androidx.paging:paging-runtime-ktx:3.3.2")
     implementation("androidx.paging:paging-compose:3.3.2")
 
+
+    //youtube player
+    implementation ("com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.28")
+
 // new way for navigation
 //implementation ("androidx.navigation:navigation-compose:2.8.0-rc01")
 //Kotlin serialization for new navigation

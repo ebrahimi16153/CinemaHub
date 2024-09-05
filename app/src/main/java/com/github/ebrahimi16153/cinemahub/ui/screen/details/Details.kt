@@ -6,17 +6,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,8 +31,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetail
@@ -36,6 +47,9 @@ import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
 import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyCircularProgress
 import com.github.ebrahimi16153.cinemahub.utils.IMAGE_URL
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 @Composable
 fun Details(
@@ -61,7 +75,7 @@ fun Details(
         mutableStateOf(Wrapper.Loading)
     }
 
-    val movieTrailers:MutableState<Wrapper<List<Trailers.Result>>> = remember {
+    val movieTrailers: MutableState<Wrapper<List<Trailers.Trailer>>> = remember {
         mutableStateOf(Wrapper.Loading)
     }
 
@@ -71,9 +85,17 @@ fun Details(
         detailsRepository.getMovieDetailsByMovieID(movieID).collect { itMovieDetail ->
             movieDetail.value = itMovieDetail
         }
-        detailsRepository.getMovieImages(movieID = movieID).collect{ itImages ->
+
+        detailsRepository.getMovieImages(movieID = movieID).collect { itImages ->
             if (itImages != null) {
                 movieImages.value = Wrapper.Success(data = itImages.posters)
+            }
+        }
+
+        detailsRepository.getMovieTrailers(movieID).collect {
+            if (it != null) {
+                movieTrailers.value = Wrapper.Success(data = it.results)
+
             }
         }
     }
@@ -94,7 +116,7 @@ fun Details(
 
             movieDetail.value?.let {
 
-                if (movieTrailers.value is Wrapper.Success){
+                if (movieTrailers.value is Wrapper.Success) {
 
                     DetailsOrientation(
                         movieDetail = it,
@@ -117,7 +139,7 @@ fun Details(
 fun DetailsOrientation(
     movieDetail: MovieDetail,
     posters: List<MovieImages.Poster?>,
-    trailers: List<Trailers.Result>,
+    trailers: List<Trailers.Trailer>,
     navHostController: NavHostController
 ) {
 
@@ -152,7 +174,7 @@ fun DetailsOrientation(
 fun DetailsPortrait(
     movieDetail: MovieDetail,
     posters: List<MovieImages.Poster?>,
-    trailers: List<Trailers.Result>,
+    trailers: List<Trailers.Trailer>,
     navHostController: NavHostController
 ) {
     LazyColumn {
@@ -168,7 +190,7 @@ fun DetailsPortrait(
         }
 
         item {
-            MovieTrailers()
+            MovieTrailers(trailers = trailers)
         }
 
     }
@@ -181,24 +203,26 @@ fun DetailsLandScape(
     movieDetail: MovieDetail,
     posters: List<MovieImages.Poster?>,
     navHostController: NavHostController,
-    trailers: List<Trailers.Result>,
+    trailers: List<Trailers.Trailer>,
     onSaveClick: (List<MovieImages.Poster?>, MovieDetail) -> Unit
 ) {
 
-    Row(modifier = Modifier.fillMaxSize()){
-        Box(modifier = Modifier
-            .fillMaxWidth(0.4f)
-            .fillMaxHeight(), contentAlignment = Alignment.Center) {
+    Row(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.4f)
+                .fillMaxHeight(), contentAlignment = Alignment.Center
+        ) {
             MovieBanner(
                 modifier = Modifier.fillMaxSize(),
                 posters = posters,
                 movieDetail = movieDetail,
                 onNavClick = { navHostController.navigateUp() },
-                onSaveClick = {itPosters,itMovieDetail -> onSaveClick(itPosters,itMovieDetail) })
+                onSaveClick = { itPosters, itMovieDetail -> onSaveClick(itPosters, itMovieDetail) })
         }
         LazyColumn(modifier = Modifier.fillMaxWidth(0.6f)) {
             item {
-                MovieTrailers()
+                MovieTrailers(trailers = trailers)
             }
         }
 
@@ -211,8 +235,8 @@ fun MovieBanner(
     modifier: Modifier = Modifier,
     posters: List<MovieImages.Poster?>,
     movieDetail: MovieDetail,
-    onSaveClick: (List<MovieImages.Poster?>,MovieDetail) -> Unit = { _,_ ->},
-    onNavClick:() -> Unit
+    onSaveClick: (List<MovieImages.Poster?>, MovieDetail) -> Unit = { _, _ -> },
+    onNavClick: () -> Unit
 ) {
 
     Box(modifier = modifier, Alignment.TopCenter) {
@@ -234,25 +258,91 @@ fun MovieBanner(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             //navigation
             FilledIconButton(onClick = { onNavClick() }) {
-                Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = "" ) }
+                Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = "")
+            }
             //save
-            FilledIconButton(onClick = { onSaveClick(posters,movieDetail) }) {
-                Icon(imageVector = Icons.Rounded.Bookmark, contentDescription = "" )
+            FilledIconButton(onClick = { onSaveClick(posters, movieDetail) }) {
+                Icon(imageVector = Icons.Rounded.Bookmark, contentDescription = "")
             }
         }
     }
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MovieTrailers(){
+fun MovieTrailers(
+    trailers: List<Trailers.Trailer>
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    val officialTrailers : MutableList<Trailers.Trailer>?  = mutableListOf()
+    trailers.forEach {
+        if (it.official== true)
+            officialTrailers?.add(it)
+    }
+
+    if (!officialTrailers.isNullOrEmpty()) {
+        val state = rememberPagerState(pageCount = { officialTrailers.size })
+        Column(horizontalAlignment = Alignment.Start) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(modifier = Modifier.padding(horizontal = 16.dp), text = " Official Trailers", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(10.dp))
+            HorizontalPager(modifier = Modifier.fillMaxWidth(), state = state) { itIndex ->
+
+                TrailerItems(trailer = officialTrailers[itIndex], lifecycleOwner = lifecycleOwner)
+
+            }
+        }
+
+
+    }
+
 
 }
+
+
+@Composable
+fun TrailerItems(
+    trailer: Trailers.Trailer,
+    lifecycleOwner: LifecycleOwner
+) {
+
+        AndroidView(modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clip(RoundedCornerShape(15.dp)),
+            factory = { itContext ->
+
+
+                YouTubePlayerView(context = itContext).apply {
+                    lifecycleOwner.lifecycle.addObserver(this)
+
+                    addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                        override fun onReady(youTubePlayer: YouTubePlayer) {
+                            youTubePlayer.cueVideo(trailer.key!!, 0f)
+                        }
+
+                        override fun onApiChange(youTubePlayer: YouTubePlayer) {
+                            youTubePlayer.pause()
+                        }
+                    })
+
+                }
+
+//            binding.webView.loadData(encodedHtml, "text/html", "base64")
+//            binding.webView.settings.javaScriptEnabled = true
+
+            })
+
+
+}
+
 
 @Composable
 fun PosterItems(poster: MovieImages.Poster) {
     AsyncImage(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().aspectRatio(9/16f),
         model = IMAGE_URL + poster.filePath,
         contentDescription = "",
         contentScale = ContentScale.Crop
