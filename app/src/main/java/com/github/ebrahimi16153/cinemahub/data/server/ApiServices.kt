@@ -142,7 +142,7 @@ interface ApiServices {
         @Path("movie_id") movieID: Int,
         @Query("language") language: String = "en-US",
         @Query("api_key") apiKey: String = API_KEY
-    ): Trailers
+    ): Response<Trailers>
 
 
 }

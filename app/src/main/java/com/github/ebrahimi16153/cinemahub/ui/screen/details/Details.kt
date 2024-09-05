@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,14 +29,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.github.ebrahimi16153.cinemahub.data.model.ImageCollection
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetail
 import com.github.ebrahimi16153.cinemahub.data.model.MovieImages
+import com.github.ebrahimi16153.cinemahub.data.model.Trailers
 import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
 import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyCircularProgress
 import com.github.ebrahimi16153.cinemahub.utils.IMAGE_URL
-import kotlinx.coroutines.flow.catch
 
 @Composable
 fun Details(
@@ -58,6 +58,10 @@ fun Details(
     }
 
     val movieImages: MutableState<Wrapper<List<MovieImages.Poster>>> = remember {
+        mutableStateOf(Wrapper.Loading)
+    }
+
+    val movieTrailers:MutableState<Wrapper<List<Trailers.Result>>> = remember {
         mutableStateOf(Wrapper.Loading)
     }
 
@@ -89,11 +93,18 @@ fun Details(
 
 
             movieDetail.value?.let {
-                DetailsOrientation(
-                    movieDetail = it,
-                    posters = (movieImages.value as Wrapper.Success).data,
-                    navHostController = navHostController
-                )
+
+                if (movieTrailers.value is Wrapper.Success){
+
+                    DetailsOrientation(
+                        movieDetail = it,
+                        posters = (movieImages.value as Wrapper.Success).data,
+                        trailers = (movieTrailers.value as Wrapper.Success).data,
+                        navHostController = navHostController
+                    )
+                }
+
+
             }
 
         }
@@ -106,6 +117,7 @@ fun Details(
 fun DetailsOrientation(
     movieDetail: MovieDetail,
     posters: List<MovieImages.Poster?>,
+    trailers: List<Trailers.Result>,
     navHostController: NavHostController
 ) {
 
@@ -118,6 +130,7 @@ fun DetailsOrientation(
             movieDetail = movieDetail,
             posters = posters,
             navHostController = navHostController,
+            trailers = trailers,
             onSaveClick = { itPosters, itMovieDetail ->
 
             }
@@ -127,6 +140,7 @@ fun DetailsOrientation(
         DetailsPortrait(
             movieDetail = movieDetail,
             posters = posters,
+            trailers = trailers,
             navHostController = navHostController
         )
 
@@ -138,6 +152,7 @@ fun DetailsOrientation(
 fun DetailsPortrait(
     movieDetail: MovieDetail,
     posters: List<MovieImages.Poster?>,
+    trailers: List<Trailers.Result>,
     navHostController: NavHostController
 ) {
     LazyColumn {
@@ -151,6 +166,11 @@ fun DetailsPortrait(
 
             )
         }
+
+        item {
+            MovieTrailers()
+        }
+
     }
 
 
@@ -161,11 +181,14 @@ fun DetailsLandScape(
     movieDetail: MovieDetail,
     posters: List<MovieImages.Poster?>,
     navHostController: NavHostController,
+    trailers: List<Trailers.Result>,
     onSaveClick: (List<MovieImages.Poster?>, MovieDetail) -> Unit
 ) {
 
     Row(modifier = Modifier.fillMaxSize()){
-        Box(modifier = Modifier.fillMaxWidth(0.4f).fillMaxHeight(), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier
+            .fillMaxWidth(0.4f)
+            .fillMaxHeight(), contentAlignment = Alignment.Center) {
             MovieBanner(
                 modifier = Modifier.fillMaxSize(),
                 posters = posters,
@@ -173,6 +196,12 @@ fun DetailsLandScape(
                 onNavClick = { navHostController.navigateUp() },
                 onSaveClick = {itPosters,itMovieDetail -> onSaveClick(itPosters,itMovieDetail) })
         }
+        LazyColumn(modifier = Modifier.fillMaxWidth(0.6f)) {
+            item {
+                MovieTrailers()
+            }
+        }
+
     }
 }
 
@@ -212,6 +241,12 @@ fun MovieBanner(
             }
         }
     }
+}
+
+
+@Composable
+fun MovieTrailers(){
+
 }
 
 @Composable
