@@ -33,7 +33,7 @@ fun MainScaffold(
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = currentBackStackEntry?.destination?.route
             if (currentRoute != null) {
-                if (!currentRoute.contains(Route.Discover.name))
+                if (!currentRoute.contains(Route.Discover.name) && !currentRoute.contains(Route.Details.name))
                     MyNavigationBar(navController = navController)
             }
         }
