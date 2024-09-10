@@ -1,11 +1,13 @@
 package com.github.ebrahimi16153.cinemahub.ui.screen.details
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,6 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +29,7 @@ import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.MovieFilter
 import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material3.Card
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,7 +49,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
@@ -56,6 +60,7 @@ import com.github.ebrahimi16153.cinemahub.data.model.MovieImages
 import com.github.ebrahimi16153.cinemahub.data.model.Trailers
 import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
 import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
+import com.github.ebrahimi16153.cinemahub.ui.componnet.CircleItems
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyCircularProgress
 import com.github.ebrahimi16153.cinemahub.utils.IMAGE_URL
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -89,9 +94,10 @@ fun Details(
     val movieTrailers: MutableState<Wrapper<List<Trailers.Trailer>>> = remember {
         mutableStateOf(Wrapper.Loading)
     }
-//    val movieCredits: MutableState<Wrapper<Credits>> = remember {
-//        mutableStateOf(Wrapper.Loading)
-//    }
+
+    val movieCredits: MutableState<Credits?> = remember {
+        mutableStateOf(null)
+    }
 
 
     LaunchedEffect(key1 = true) {
@@ -113,11 +119,11 @@ fun Details(
             }
         }
 
-//        detailsRepository.getCredits(movieID).collect { itCredits ->
-//            if (itCredits != null) {
-//                movieCredits.value = Wrapper.Success(data = itCredits)
-//            }
-//        }
+        detailsRepository.getCredits(movieID).collect { itCredits ->
+            if (itCredits != null) {
+                movieCredits.value = itCredits
+            }
+        }
     }
 
 
@@ -138,13 +144,15 @@ fun Details(
 
                 if (movieTrailers.value is Wrapper.Success) {
 
-                    DetailsOrientation(
-                        movieDetail = it,
-                        posters = (movieImages.value as Wrapper.Success).data,
-                        trailers = (movieTrailers.value as Wrapper.Success).data,
-//                        movieCredits = (movieCredits.value as Wrapper.Success).data,
-                        navHostController = navHostController
-                    )
+                    movieCredits.value?.let { it1 ->
+                        DetailsOrientation(
+                            movieDetail = it,
+                            posters = (movieImages.value as Wrapper.Success).data,
+                            trailers = (movieTrailers.value as Wrapper.Success).data,
+                            movieCredits = it1,
+                            navHostController = navHostController
+                        )
+                    }
                 }
 
 
@@ -161,8 +169,8 @@ fun DetailsOrientation(
     movieDetail: MovieDetail,
     posters: List<MovieImages.Poster?>,
     trailers: List<Trailers.Trailer>,
-//    movieCredits: Credits,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    movieCredits: Credits
 ) {
 
 
@@ -175,7 +183,7 @@ fun DetailsOrientation(
             posters = posters,
             navHostController = navHostController,
             trailers = trailers,
-//            movieCredits = movieCredits,
+            movieCredits = movieCredits,
             onSaveClick = { itPosters, itMovieDetail ->
 
             }
@@ -186,7 +194,7 @@ fun DetailsOrientation(
             movieDetail = movieDetail,
             posters = posters,
             trailers = trailers,
-//            movieCredits = movieCredits,
+            movieCredits = movieCredits,
             navHostController = navHostController
         )
 
@@ -200,7 +208,7 @@ fun DetailsPortrait(
     posters: List<MovieImages.Poster?>,
     trailers: List<Trailers.Trailer>,
     navHostController: NavHostController,
-//    movieCredits: Credits
+    movieCredits: Credits,
 ) {
     LazyColumn {
         item {
@@ -218,13 +226,19 @@ fun DetailsPortrait(
 
         item {
             MovieTrailers(trailers = trailers)
+            MovieIfo(
+                movieDetail = movieDetail,
+                movieCredits = movieCredits
+            )
+
+
         }
         item {
-            MovieIfo(movieDetail = movieDetail,
-//                movieCredits = movieCredits
-            )
+            Spacer(modifier = Modifier.height(10.dp))
+            MovieCast(movieCredits = movieCredits)
+            Spacer(modifier = Modifier.height(10.dp))
+            MovieCompany(movieDetail = movieDetail)
         }
-
     }
 
 
@@ -237,6 +251,7 @@ fun DetailsLandScape(
     navHostController: NavHostController,
     trailers: List<Trailers.Trailer>,
     onSaveClick: (List<MovieImages.Poster?>, MovieDetail) -> Unit,
+    movieCredits: Credits,
 //    movieCredits: Credits
 ) {
 
@@ -256,11 +271,20 @@ fun DetailsLandScape(
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             item {
                 MovieTrailers(trailers = trailers)
+                MovieIfo(
+                    movieDetail = movieDetail,
+                    movieCredits = movieCredits,
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(text = "Cast", modifier = Modifier.padding(horizontal = 16.dp))
+
+
             }
             item {
-                MovieIfo(movieDetail = movieDetail,
-//                    movieCredits = movieCredits
-                )
+                Spacer(modifier = Modifier.height(10.dp))
+                MovieCast(movieCredits = movieCredits)
+                Spacer(modifier = Modifier.height(10.dp))
+                MovieCompany(movieDetail = movieDetail)
             }
         }
 
@@ -309,11 +333,10 @@ fun MovieBanner(
             }
 
             PosterInfo(movieDetail = movieDetail)
+            Spacer(modifier = Modifier.height(10.dp))
+
         }
-
-
     }
-
 }
 
 
@@ -346,11 +369,7 @@ fun MovieTrailers(
 
             }
         }
-
-
     }
-
-
 }
 
 
@@ -362,7 +381,7 @@ fun TrailerItems(
 
     AndroidView(modifier = Modifier
         .fillMaxWidth()
-        .padding(8.dp)
+        .padding(16.dp)
         .clip(RoundedCornerShape(15.dp)),
         factory = { itContext ->
 
@@ -379,12 +398,7 @@ fun TrailerItems(
                         youTubePlayer.pause()
                     }
                 })
-
             }
-
-//            binding.webView.loadData(encodedHtml, "text/html", "base64")
-//            binding.webView.settings.javaScriptEnabled = true
-
         })
 
 
@@ -487,13 +501,13 @@ fun PosterInfo(movieDetail: MovieDetail) {
                     .padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 //country
-                var country by remember {
-                    mutableStateOf("")
-                }
-
-                movieDetail.productionCountries.forEach { itCountry ->
-                    country += itCountry.name + ","
-                }
+//                var country by remember {
+//                    mutableStateOf("")
+//                }
+//
+//                movieDetail.productionCountries.forEach { itCountry ->
+//                    country += itCountry.name + ","
+//                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -507,7 +521,7 @@ fun PosterInfo(movieDetail: MovieDetail) {
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = country,
+                        text = movieDetail.productionCountries.toString().removePrefix("[").removeSuffix("]"),
                         style = MaterialTheme.typography.bodySmall
                     )
 
@@ -520,34 +534,23 @@ fun PosterInfo(movieDetail: MovieDetail) {
 }
 
 @Composable
-fun MovieIfo(movieDetail: MovieDetail) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+fun MovieIfo(movieDetail: MovieDetail, movieCredits: Credits) {
 
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = "Overview",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Spacer(modifier = Modifier.height(5.dp))
-        Text(
-            modifier = Modifier.padding(16.dp),
-            text = movieDetail.overview.toString()
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = "Director & Producer",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Spacer(modifier = Modifier.height(5.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Card(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = "Overview",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Spacer(modifier = Modifier.height(5.dp))
+            Text(
+                modifier = Modifier.padding(16.dp),
+                text = movieDetail.overview.toString()
+            )
+            Spacer(modifier = Modifier.height(5.dp))
             var director by remember {
                 mutableStateOf("")
             }
@@ -556,20 +559,40 @@ fun MovieIfo(movieDetail: MovieDetail) {
                 mutableStateOf("")
             }
 
-//            if(movieCredits.crew.isNotEmpty()){
-//                movieCredits.crew.forEach { itCrew ->
-//                    if (itCrew.job == "Producer"){
-//                        producer += itCrew.name+" "
-//                    }else if ( itCrew.job == "Director"){
-//                        director += itCrew.name+" "
-//                    }
-//                }
-//            }
-//
-//
-//            Text(text = "Directors: $director")
-//            Text(text = "Directors: $producer")
+            movieCredits.crew.forEach {
+                if (it.job == "Producer") {
+                    producer += it.name + " "
+                } else if (it.job == "Director") {
+                    director += it.name + " "
+                }
+            }
 
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                text = "Director: $director"
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                text = "Producer: $producer"
+            )
+
+        }
+}
+
+@Composable
+fun MovieCast(movieCredits: Credits){
+
+    LazyRow(
+        contentPadding = PaddingValues(16.dp),
+
+    ) {
+        items(items = movieCredits.cast){ itCast ->
+
+            itCast.name?.let { CircleItems(name = it, imagePath = IMAGE_URL+itCast.profilePath ) }
 
         }
 
@@ -577,6 +600,17 @@ fun MovieIfo(movieDetail: MovieDetail) {
     }
 
 
+}
+
+@Composable
+fun MovieCompany(movieDetail: MovieDetail){
+    LazyRow(
+        horizontalArrangement = Arrangement.Center
+    ) {
+        items(items = movieDetail.productionCompanies){
+            CircleItems(name = it.name.toString(), imagePath = IMAGE_URL+it.logoPath )
+        }
+    }
 }
 
 

@@ -84,7 +84,11 @@ data class MovieDetail(
         val iso31661: String?, // US
         @SerializedName("name")
         val name: String? // United States of America
-    )
+    ){
+        override fun toString(): String {
+            return "$name "
+        }
+    }
 
     data class SpokenLanguage(
         @SerializedName("english_name")
