@@ -9,11 +9,13 @@ import androidx.paging.cachedIn
 import com.github.ebrahimi16153.cinemahub.data.model.Genre
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.repository.DiscoverRepository
+import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
@@ -34,13 +36,15 @@ class DiscoverViewModel @Inject constructor(private val discoverRepository: Disc
     }
 
 
-    private val _genres = MutableStateFlow<List<Genre>>(emptyList())
-    val genres: StateFlow<List<Genre>> = _genres
+    private val _genres = MutableStateFlow<Wrapper<List<Genre>>>(Wrapper.Loading)
+    val genres: StateFlow<Wrapper<List<Genre>>> = _genres
 
 
     private fun getGenres() = viewModelScope.launch {
-        discoverRepository.getGenresList().collectLatest { itGenres ->
-            _genres.value = itGenres
+        discoverRepository.getGenresList().catch { itException ->
+            Wrapper.Error(message = itException.message.toString())
+        }.collectLatest { itGenres ->
+            _genres.value = Wrapper.Success(data = itGenres)
         }
     }
 
@@ -51,8 +55,7 @@ class DiscoverViewModel @Inject constructor(private val discoverRepository: Disc
 
     fun getMoviesByGenre(genreName:String) = viewModelScope.launch {
         discoverRepository.getMoviesByGenre(genreName).cachedIn(viewModelScope).collectLatest { itMovies ->
-
-            _moviesByGenre.value = itMovies
+            _moviesByGenre.value =  itMovies
 
         }
 

@@ -10,8 +10,11 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
+import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
+import com.github.ebrahimi16153.cinemahub.ui.componnet.MyCircularProgress
 import com.github.ebrahimi16153.cinemahub.ui.screen.details.Details
 import com.github.ebrahimi16153.cinemahub.ui.screen.discover.DiscoverScreen
 import com.github.ebrahimi16153.cinemahub.ui.screen.home.HomeScreen
@@ -83,21 +86,28 @@ fun Navigation(
         composable(Route.Discover.name + "/{genreID}/{genreName}") { backStackEntry ->
             genreId = backStackEntry.arguments?.getString("genreID") ?: "-1"
             genreName = backStackEntry.arguments?.getString("genreName") ?: ""
-            DiscoverScreen(
-                discoverViewModel = discoverViewModel,
-                navHostController = navHostController,
-                genreName = genreName,
-                genreID = genreId.toInt(),
-                movies = discoverMovies,
-                genres = genres,
-                isGrid = isGrid,
-                onGenreClick = { itGenre ->
-                    genreId.let { discoverViewModel.getMoviesByGenre(itGenre.id.toString()) }
 
-                },
-                onGridClick = {
-                    discoverViewModel.setIsGrid(!isGrid)
-                })
+            if (discoverMovies.loadState.refresh !is LoadState.Loading) {
+                DiscoverScreen(
+                    discoverViewModel = discoverViewModel,
+                    navHostController = navHostController,
+                    genreName = genreName,
+                    genreID = genreId.toInt(),
+                    movies = discoverMovies,
+                    genres = (genres as Wrapper.Success).data,
+                    isGrid = isGrid,
+                    onGenreClick = { itGenre ->
+                        genreId.let { discoverViewModel.getMoviesByGenre(itGenre.id.toString()) }
+
+                    },
+                    onGridClick = {
+                        discoverViewModel.setIsGrid(!isGrid)
+                    })
+            }else{
+                MyCircularProgress()
+            }
+
+
 
         }
 

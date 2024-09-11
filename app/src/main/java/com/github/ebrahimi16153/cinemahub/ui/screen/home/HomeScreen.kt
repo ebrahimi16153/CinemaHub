@@ -43,9 +43,11 @@ import androidx.navigation.NavHostController
 import com.github.ebrahimi16153.cinemahub.R
 import com.github.ebrahimi16153.cinemahub.data.model.Genre
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
+import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
 import com.github.ebrahimi16153.cinemahub.ui.componnet.BannerItems
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GenreItem
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GridMovieItems
+import com.github.ebrahimi16153.cinemahub.ui.componnet.MyCircularProgress
 import com.github.ebrahimi16153.cinemahub.utils.Route
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 
@@ -65,31 +67,41 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    if (isLandscape) {
 
-        //landscape design
-        LandscapeHome(
-            navHostController = navHostController,
-            mainBannerMovies = movies,
-            nowPlayingMovieList = nowPlayingMovieList,
-            topRateMovie = topRateMovie,
-            popularMovie = popularMovie,
-            upcomingMovie = upcomingMovie,
-            genres = genres
-        )
+
+    if (movies is Wrapper.Loading || genres is Wrapper.Loading ||
+        nowPlayingMovieList is Wrapper.Loading || topRateMovie is Wrapper.Loading ||
+        popularMovie is Wrapper.Loading || upcomingMovie is Wrapper.Loading) {
+
+        MyCircularProgress()
 
     } else {
+        if (isLandscape) {
 
-        // portrait design
-        PortraitHome(
-            navHostController = navHostController,
-            mainBannerMovies = movies,
-            nowPlayingMovieList = nowPlayingMovieList,
-            topRateMovie = topRateMovie,
-            popularMovie = popularMovie,
-            upcomingMovie = upcomingMovie,
-            genres = genres
-        )
+            //landscape design
+            LandscapeHome(
+                navHostController = navHostController,
+                mainBannerMovies = (movies as Wrapper.Success).data,
+                nowPlayingMovieList = (nowPlayingMovieList as Wrapper.Success).data,
+                topRateMovie = (topRateMovie as Wrapper.Success).data,
+                popularMovie = (popularMovie as Wrapper.Success).data,
+                upcomingMovie = (upcomingMovie as Wrapper.Success).data,
+                genres = (genres as Wrapper.Success).data
+            )
+
+        } else {
+
+            // portrait design
+            PortraitHome(
+                navHostController = navHostController,
+                mainBannerMovies = (movies as Wrapper.Success).data,
+                nowPlayingMovieList = (nowPlayingMovieList as Wrapper.Success).data,
+                topRateMovie = (topRateMovie as Wrapper.Success).data,
+                popularMovie = (popularMovie as Wrapper.Success).data,
+                upcomingMovie = (upcomingMovie as Wrapper.Success).data,
+                genres = (genres as Wrapper.Success).data
+            )
+        }
     }
 }
 
@@ -260,7 +272,7 @@ fun MovieSection(
         Spacer(modifier = Modifier.height(10.dp))
         HorizontalMovieList(
             movies = nowPlayingMovieList,
-            onMovieClick = { navHostController.navigate(Route.Details.name+ "/$it")  })
+            onMovieClick = { navHostController.navigate(Route.Details.name + "/$it") })
         // topRate
         Spacer(modifier = Modifier.height(10.dp))
         Text(
@@ -270,7 +282,7 @@ fun MovieSection(
         Spacer(modifier = Modifier.height(10.dp))
         HorizontalMovieList(
             movies = topRateMovie,
-            onMovieClick = { navHostController.navigate(Route.Details.name+ "/$it")  })
+            onMovieClick = { navHostController.navigate(Route.Details.name + "/$it") })
         // popular
         Spacer(modifier = Modifier.height(10.dp))
         Text(
@@ -280,7 +292,7 @@ fun MovieSection(
         Spacer(modifier = Modifier.height(10.dp))
         HorizontalMovieList(
             movies = popularMovie,
-            onMovieClick = { navHostController.navigate(Route.Details.name+ "/$it")  })
+            onMovieClick = { navHostController.navigate(Route.Details.name + "/$it") })
 
         // upComing
         Spacer(modifier = Modifier.height(10.dp))
@@ -291,7 +303,7 @@ fun MovieSection(
         Spacer(modifier = Modifier.height(10.dp))
         HorizontalMovieList(
             movies = upcomingMovie,
-            onMovieClick = { navHostController.navigate(Route.Details.name+ "/$it")  })
+            onMovieClick = { navHostController.navigate(Route.Details.name + "/$it") })
 
     }
 }
