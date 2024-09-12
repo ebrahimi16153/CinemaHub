@@ -24,10 +24,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -110,18 +112,36 @@ fun DiscoverScreen(
             }
 
             //MovieList
-            if (isGrid) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
+                if (isGrid) {
 
-                DiscoverGridMovieList(movies = movies, onMovieClick = { itMovieId ->
-                    navHostController.navigate(Route.Details.name + "/$itMovieId")
-                })
-            } else {
+                    DiscoverGridMovieList(movies = movies, onMovieClick = { itMovieId ->
+                        navHostController.navigate(Route.Details.name + "/$itMovieId")
+                    })
+                } else {
 
-                DiscoverRowMovieList(movies = movies, onMovieClick = { itMovieId ->
-                    navHostController.navigate(Route.Details.name + "/$itMovieId")
+                    DiscoverRowMovieList(movies = movies, onMovieClick = { itMovieId ->
+                        navHostController.navigate(Route.Details.name + "/$itMovieId")
 
-                })
+                    })
 
+                }
+                if (movies.loadState.append is LoadState.Loading) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(45.dp)
+                            .background(color = MaterialTheme.colorScheme.primary),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            trackColor = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 1.dp,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                }
             }
 
 
@@ -159,35 +179,25 @@ fun DiscoverGridMovieList(
     movies: LazyPagingItems<Movie>
 ) {
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
 
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Adaptive(130.dp),
-            contentPadding = PaddingValues(vertical = 16.dp),
-            verticalItemSpacing = 3.dp,
-            horizontalArrangement = Arrangement.spacedBy(1.dp)
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Adaptive(130.dp),
+        contentPadding = PaddingValues(vertical = 16.dp),
+        verticalItemSpacing = 3.dp,
+        horizontalArrangement = Arrangement.spacedBy(1.dp)
 
-        ) {
+    ) {
 
-            items(count = movies.itemCount) { itIndex ->
+        items(count = movies.itemCount) { itIndex ->
 
-                movies[itIndex]?.let {
-                    GridMovieItems(movie = it) { movieID ->
-                        onMovieClick(movieID)
-                    }
-                }
+            key(movies){
+                movies[itIndex]?.id
             }
-        }
 
-        if (movies.loadState.refresh is LoadState.Loading) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(30.dp)
-                    .background(color = MaterialTheme.colorScheme.primary),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(modifier = Modifier.size(30.dp))
+            movies[itIndex]?.let {
+                GridMovieItems(movie = it) { movieID ->
+                    onMovieClick(movieID)
+                }
             }
         }
     }
