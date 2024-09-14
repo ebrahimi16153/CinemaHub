@@ -50,7 +50,6 @@ fun MainScaffold(
                 homeViewModel = homeViewModel,
                 searchViewModel = searchViewModel,
                 discoverViewModel = discoverViewModel,
-                detailsViewModel = detailsViewModel,
                 detailsRepository = detailsRepository
             )
 

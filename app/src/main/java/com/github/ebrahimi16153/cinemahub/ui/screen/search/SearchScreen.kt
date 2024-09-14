@@ -72,7 +72,7 @@ fun MySearchBar(
         value = searchQuery,
         onValueChange = { onSearchQueryChange(it) },
         maxLines = 1,
-        label = { Text(text = stringResource(id = R.string.search_label)) },
+        label = { Text(text = stringResource(id = R.string.searchBar_label)) },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions.Default
     )

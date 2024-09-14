@@ -1,5 +1,6 @@
 package com.github.ebrahimi16153.cinemahub.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,15 +24,26 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
 
 
     init {
-        //get movies
-        getNowPlayingMovies()
-        getTopRateMovie()
-        getPopularMovie()
-        getUpcomingMovie()
-        getMovieOFBanner()
-        getGenres()
+        try {
+
+
+            //get movies
+            getNowPlayingMovies()
+            getTopRateMovie()
+            getPopularMovie()
+            getUpcomingMovie()
+            getMovieOFBanner()
+            getGenres()
+        }catch (e:Exception){
+            Log.e("TAG",e.message.toString())
+        }
+
 
     }
+
+    //////////////////////////Error///////////////////////////////////
+    private val _error = MutableStateFlow<Wrapper<String>>(Wrapper.Idle)
+     val error: StateFlow<Wrapper<String>> = _error
 
 
     ///////////////////////////////Genres////////////////////////////
@@ -40,13 +52,20 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
 
 
     private fun getGenres() = viewModelScope.launch {
-        homeRepository.getGenresList().catch { itException ->
+        try {
+            homeRepository.getGenresList().catch { itException ->
 
-            _genres.value = Wrapper.Error(message = itException.message.toString())
+                _error.value = Wrapper.Error(message = itException.message.toString())
 
-        }.collectLatest { itGenres ->
-            _genres.value = Wrapper.Success(data = itGenres)
+            }.collectLatest { itGenres ->
+                _genres.value = Wrapper.Success(data = itGenres)
+            }
+
+
+        } catch (e: Exception) {
+            _error.value = Wrapper.Error(message = e.message.toString())
         }
+
     }
 
 
@@ -56,12 +75,18 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
 
 
     private fun getMovieOFBanner() = viewModelScope.launch {
-        homeRepository.trendingMovie().catch { itException ->
+        try {
+            homeRepository.getTopRatedMovie().catch { itException ->
 
-            _movieOfBanner.value = Wrapper.Error(message = itException.message.toString())
+                _error.value = Wrapper.Error(message = itException.message.toString())
 
-        }.collectLatest { itMoves ->
-            _movieOfBanner.value = Wrapper.Success(data = itMoves)
+            }.collectLatest { itMovies ->
+                _movieOfBanner.value = Wrapper.Success(data = itMovies)
+                _error.value = Wrapper.Idle
+            }
+
+        } catch (e: Exception) {
+            _error.value = Wrapper.Error(message = e.message.toString())
         }
     }
 
@@ -70,60 +95,89 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     val nowPlayingMovie: StateFlow<Wrapper<List<Movie>>> = _nowPlayingMovie
 
     private fun getNowPlayingMovies() = viewModelScope.launch {
-        homeRepository.nowPlayingMovie().catch { itException ->
 
-            _nowPlayingMovie.value = Wrapper.Error(message = itException.message.toString())
+        try {
+            homeRepository.nowPlayingMovie().catch { itException ->
 
-        }.collectLatest { itMovies ->
-            _nowPlayingMovie.value = Wrapper.Success(data = itMovies)
+                _error.value = Wrapper.Error(message = itException.message.toString())
+
+            }.collectLatest { itMovies ->
+                _nowPlayingMovie.value = Wrapper.Success(data = itMovies)
+                _error.value = Wrapper.Idle
+            }
+
+        } catch (e: Exception) {
+            _error.value = Wrapper.Error(message = e.message.toString())
         }
+
     }
 
     ////////////////////////////////////TOP RATE MOVIE/////////////////////////////////
 
     private val _topRateMovie = MutableStateFlow<Wrapper<List<Movie>>>(Wrapper.Loading)
-    val topRateMovie : StateFlow<Wrapper<List<Movie>>> = _topRateMovie
+    val topRateMovie: StateFlow<Wrapper<List<Movie>>> = _topRateMovie
 
     private fun getTopRateMovie() = viewModelScope.launch {
 
-        homeRepository.getTopRatedMovie().catch { itException ->
+        try {
+            homeRepository.getTopRatedMovie().catch { itException ->
 
-            _topRateMovie.value = Wrapper.Error(message =  itException.message.toString())
+                _error.value = Wrapper.Error(message = itException.message.toString())
 
-        }.collectLatest { itMovies ->
-            _topRateMovie.value = Wrapper.Success(data = itMovies)
+            }.collectLatest { itMovies ->
+                _topRateMovie.value = Wrapper.Success(data = itMovies)
+                _error.value = Wrapper.Idle
+            }
+        } catch (e: Exception) {
+            _error.value = Wrapper.Error(message = e.message.toString())
         }
+
+
     }
 
     ////////////////////////////Popular Movie//////////////////////////
 
     private val _popularMovie = MutableStateFlow<Wrapper<List<Movie>>>(Wrapper.Loading)
-    val popularMovie : StateFlow<Wrapper<List<Movie>>> = _popularMovie
+    val popularMovie: StateFlow<Wrapper<List<Movie>>> = _popularMovie
 
     private fun getPopularMovie() = viewModelScope.launch {
-        homeRepository.getPopularMovie().catch { itException ->
 
-            _popularMovie.value = Wrapper.Error(message = itException.message.toString())
+        try {
+            homeRepository.getPopularMovie().catch { itException ->
 
-        }.collectLatest {itMovies ->
-            _popularMovie.value = Wrapper.Success(data = itMovies)
+                _error.value = Wrapper.Error(message = itException.message.toString())
+
+            }.collectLatest { itMovies ->
+                _popularMovie.value = Wrapper.Success(data = itMovies)
+                _error.value = Wrapper.Idle
+            }
+        } catch (e: Exception) {
+            _error.value = Wrapper.Error(message = e.message.toString())
         }
+
     }
 
     ///////////////////////////up coming//////////////////////////////////
     private val _upcomingMovie = MutableStateFlow<Wrapper<List<Movie>>>(Wrapper.Loading)
-    val upcomingMovie : StateFlow<Wrapper<List<Movie>>> = _upcomingMovie
+    val upcomingMovie: StateFlow<Wrapper<List<Movie>>> = _upcomingMovie
 
     private fun getUpcomingMovie() = viewModelScope.launch {
-        homeRepository.getUpcomingMovie()
-            .catch { itException ->
 
-                _upcomingMovie.value = Wrapper.Error(message = itException.message.toString())
+        try {
+            homeRepository.getUpcomingMovie()
+                .catch { itException ->
 
-            }
-            .collectLatest {itMovies ->
-            _upcomingMovie.value = Wrapper.Success(data = itMovies)
+                    _error.value = Wrapper.Error(message = itException.message.toString())
+
+                }
+                .collectLatest { itMovies ->
+                    _upcomingMovie.value = Wrapper.Success(data = itMovies)
+                    _error.value = Wrapper.Idle
+                }
+        } catch (e: Exception) {
+            _error.value = Wrapper.Error(message = e.message.toString())
         }
+
     }
 
 }

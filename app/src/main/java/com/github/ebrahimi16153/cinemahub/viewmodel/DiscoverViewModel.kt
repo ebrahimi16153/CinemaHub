@@ -41,11 +41,16 @@ class DiscoverViewModel @Inject constructor(private val discoverRepository: Disc
 
 
     private fun getGenres() = viewModelScope.launch {
-        discoverRepository.getGenresList().catch { itException ->
-            Wrapper.Error(message = itException.message.toString())
-        }.collectLatest { itGenres ->
-            _genres.value = Wrapper.Success(data = itGenres)
+        try {
+            discoverRepository.getGenresList().catch { itException ->
+                Wrapper.Error(message = itException.message.toString())
+            }.collectLatest { itGenres ->
+                _genres.value = Wrapper.Success(data = itGenres)
+            }
+        }catch (e:Exception){
+            _genres.value = Wrapper.Error(message = e.message.toString())
         }
+
     }
 
     //////////////////////////MovesByGenre////////////////////////////

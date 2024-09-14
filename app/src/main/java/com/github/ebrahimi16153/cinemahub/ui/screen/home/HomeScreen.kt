@@ -1,7 +1,6 @@
 package com.github.ebrahimi16153.cinemahub.ui.screen.home
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.room.Query
 import com.github.ebrahimi16153.cinemahub.R
 import com.github.ebrahimi16153.cinemahub.data.model.Genre
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
@@ -62,6 +62,7 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
     val topRateMovie by homeViewModel.topRateMovie.collectAsState()
     val popularMovie by homeViewModel.popularMovie.collectAsState()
     val upcomingMovie by homeViewModel.upcomingMovie.collectAsState()
+    val error by homeViewModel.error.collectAsState()
 
     ////////////////////handel orientation of screen /////////////////////////////////
 
@@ -76,32 +77,41 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
         MyCircularProgress()
 
     } else {
-        if (isLandscape) {
+        if (error is Wrapper.Error){
+            Box(Modifier.fillMaxSize(), Alignment.Center) {
+                Text(text = (error as Wrapper.Error).message.toString())
+            }
+        }else{
 
-            //landscape design
-            LandscapeHome(
-                navHostController = navHostController,
-                mainBannerMovies = (movies as Wrapper.Success).data,
-                nowPlayingMovieList = (nowPlayingMovieList as Wrapper.Success).data,
-                topRateMovie = (topRateMovie as Wrapper.Success).data,
-                popularMovie = (popularMovie as Wrapper.Success).data,
-                upcomingMovie = (upcomingMovie as Wrapper.Success).data,
-                genres = (genres as Wrapper.Success).data
-            )
+            if (isLandscape) {
 
-        } else {
+                //landscape design
+                LandscapeHome(
+                    navHostController = navHostController,
+                    mainBannerMovies = (movies as Wrapper.Success).data,
+                    nowPlayingMovieList = (nowPlayingMovieList as Wrapper.Success).data,
+                    topRateMovie = (topRateMovie as Wrapper.Success).data,
+                    popularMovie = (popularMovie as Wrapper.Success).data,
+                    upcomingMovie = (upcomingMovie as Wrapper.Success).data,
+                    genres = (genres as Wrapper.Success).data
+                )
 
-            // portrait design
-            PortraitHome(
-                navHostController = navHostController,
-                mainBannerMovies = (movies as Wrapper.Success).data,
-                nowPlayingMovieList = (nowPlayingMovieList as Wrapper.Success).data,
-                topRateMovie = (topRateMovie as Wrapper.Success).data,
-                popularMovie = (popularMovie as Wrapper.Success).data,
-                upcomingMovie = (upcomingMovie as Wrapper.Success).data,
-                genres = (genres as Wrapper.Success).data
-            )
+            } else {
+
+                // portrait design
+                PortraitHome(
+                    navHostController = navHostController,
+                    mainBannerMovies = (movies as Wrapper.Success).data,
+                    nowPlayingMovieList = (nowPlayingMovieList as Wrapper.Success).data,
+                    topRateMovie = (topRateMovie as Wrapper.Success).data,
+                    popularMovie = (popularMovie as Wrapper.Success).data,
+                    upcomingMovie = (upcomingMovie as Wrapper.Success).data,
+                    genres = (genres as Wrapper.Success).data
+                )
+            }
         }
+
+
     }
 }
 

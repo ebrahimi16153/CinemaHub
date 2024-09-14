@@ -8,6 +8,7 @@ import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.paging.DiscoverPaging
 import com.github.ebrahimi16153.cinemahub.data.server.ApiServices
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -16,31 +17,34 @@ class DiscoverRepository @Inject constructor(private val apiServices: ApiService
 
     // genreList
     suspend fun getGenresList(): Flow<List<Genre>> {
-        val response = apiServices.getGenres()
-        return if (response.isSuccessful){
-            flow {
-                response.body()?.let { emit(it.genres) }
+
+        try {
+            val response = apiServices.getGenres()
+            when(response.code()){
+                in 200..299 -> {
+                    return flow { response.body()?.genres }
+                }
+
+                in 300..399 -> {
+                    throw Exception("Error code 300")
+                }
+
+                in 400..499 ->{
+                    throw Exception("Error Code 400")
+                }
+
+                in 500..599 -> {
+                    throw Exception("Error code 500")
+                }
+                else -> {
+                    throw Exception("unKnown Error")
+                }
             }
-        }else{
-            flow { emptyList<List<Genre>>() }
+        }catch (e:Exception){
+            throw e
         }
     }
 
-    //Movies
-//    suspend fun getMoviesByGenre(genreName:String):Flow<List<Movie>>{
-//
-//        val response = apiServices.getMovieByGenres(withGenres = genreName)
-//
-//        return if (response.isSuccessful){
-//            flow {
-//                response.body()?.results?.let { emit(it) }
-//            }
-//        }else{
-//            flow { emptyList<List<Movie>>() }
-//        }
-//    }
-
-    //Movies by Paging3
 
 
     fun getMoviesByGenre(genreName:String): Flow<PagingData<Movie>> {

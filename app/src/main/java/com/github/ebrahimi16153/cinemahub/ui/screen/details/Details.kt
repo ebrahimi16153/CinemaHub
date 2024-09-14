@@ -1,7 +1,6 @@
 package com.github.ebrahimi16153.cinemahub.ui.screen.details
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -83,8 +82,8 @@ fun Details(
      */
 
 
-    val movieDetail: MutableState<MovieDetail?> = remember {
-        mutableStateOf(null)
+    val movieDetail: MutableState<Wrapper<MovieDetail?>> = remember {
+        mutableStateOf(Wrapper.Loading)
     }
 
     val movieImages: MutableState<Wrapper<List<MovieImages.Poster>>> = remember {
@@ -95,15 +94,15 @@ fun Details(
         mutableStateOf(Wrapper.Loading)
     }
 
-    val movieCredits: MutableState<Credits?> = remember {
-        mutableStateOf(null)
+    val movieCredits: MutableState<Wrapper<Credits>> = remember {
+        mutableStateOf(Wrapper.Loading)
     }
 
 
     LaunchedEffect(key1 = true) {
 
         detailsRepository.getMovieDetailsByMovieID(movieID).collect { itMovieDetail ->
-            movieDetail.value = itMovieDetail
+            movieDetail.value = Wrapper.Success(data = itMovieDetail)
         }
 
         detailsRepository.getMovieImages(movieID = movieID).collect { itImages ->
@@ -120,45 +119,60 @@ fun Details(
         }
 
         detailsRepository.getCredits(movieID).collect { itCredits ->
-            if (itCredits != null) {
-                movieCredits.value = itCredits
+            itCredits?.let { it2 ->
+                movieCredits.value = Wrapper.Success(data = it2)
             }
         }
     }
 
 
-    when (movieImages.value) {
-        is Wrapper.Error -> {
-            Text(text = (movieImages.value as Wrapper.Error).message)
-        }
+//    when (movieImages.value) {
+//        is Wrapper.Error -> {
+//            Text(text = (movieImages.value as Wrapper.Error).message)
+//        }
+//
+//        Wrapper.Idle -> {}
+//        Wrapper.Loading -> {
+//            MyCircularProgress()
+//        }
+//
+//        is Wrapper.Success -> {
+//
+//
+//            movieDetail.value?.let {
+//
+//                if (movieTrailers.value is Wrapper.Success) {
+//
+//                    movieCredits.value?.let { it1 ->
+//                        DetailsOrientation(
+//                            movieDetail = it,
+//                            posters = (movieImages.value as Wrapper.Success).data,
+//                            trailers = (movieTrailers.value as Wrapper.Success).data,
+//                            movieCredits = it1,
+//                            navHostController = navHostController
+//                        )
+//                    }
+//                }
+//
+//
+//            }
+//
+//        }
+//    }
 
-        Wrapper.Idle -> {}
-        Wrapper.Loading -> {
-            MyCircularProgress()
-        }
 
-        is Wrapper.Success -> {
+    if (movieDetail.value is Wrapper.Loading || movieTrailers.value is Wrapper.Loading || movieImages.value is Wrapper.Loading || movieCredits.value is Wrapper.Loading) {
 
+        MyCircularProgress()
 
-            movieDetail.value?.let {
-
-                if (movieTrailers.value is Wrapper.Success) {
-
-                    movieCredits.value?.let { it1 ->
-                        DetailsOrientation(
-                            movieDetail = it,
-                            posters = (movieImages.value as Wrapper.Success).data,
-                            trailers = (movieTrailers.value as Wrapper.Success).data,
-                            movieCredits = it1,
-                            navHostController = navHostController
-                        )
-                    }
-                }
-
-
-            }
-
-        }
+    } else {
+        DetailsOrientation(
+            movieDetail = (movieDetail.value as Wrapper.Success).data!!,
+            posters = (movieImages.value as Wrapper.Success).data,
+            trailers = (movieTrailers.value as Wrapper.Success).data,
+            movieCredits = (movieCredits.value as Wrapper.Success).data,
+            navHostController = navHostController
+        )
     }
 
 
@@ -347,10 +361,10 @@ fun MovieTrailers(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val officialTrailers: MutableList<Trailers.Trailer>? = mutableListOf()
+    val officialTrailers: MutableList<Trailers.Trailer> = mutableListOf()
     trailers.forEach {
         if (it.official == true)
-            officialTrailers?.add(it)
+            officialTrailers.add(it)
     }
 
     if (!officialTrailers.isNullOrEmpty()) {
@@ -500,14 +514,6 @@ fun PosterInfo(movieDetail: MovieDetail) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                //country
-//                var country by remember {
-//                    mutableStateOf("")
-//                }
-//
-//                movieDetail.productionCountries.forEach { itCountry ->
-//                    country += itCountry.name + ","
-//                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -521,7 +527,8 @@ fun PosterInfo(movieDetail: MovieDetail) {
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = movieDetail.productionCountries.toString().removePrefix("[").removeSuffix("]"),
+                        text = movieDetail.productionCountries.toString().removePrefix("[")
+                            .removeSuffix("]"),
                         style = MaterialTheme.typography.bodySmall
                     )
 
@@ -536,63 +543,65 @@ fun PosterInfo(movieDetail: MovieDetail) {
 @Composable
 fun MovieIfo(movieDetail: MovieDetail, movieCredits: Credits) {
 
-        Card(modifier = Modifier
+    Card(
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)) {
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = "Overview",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Spacer(modifier = Modifier.height(5.dp))
-            Text(
-                modifier = Modifier.padding(16.dp),
-                text = movieDetail.overview.toString()
-            )
-            Spacer(modifier = Modifier.height(5.dp))
-            var director by remember {
-                mutableStateOf("")
-            }
-
-            var producer by remember {
-                mutableStateOf("")
-            }
-
-            movieCredits.crew.forEach {
-                if (it.job == "Producer") {
-                    producer += it.name + " "
-                } else if (it.job == "Director") {
-                    director += it.name + " "
-                }
-            }
-
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                text = "Director: $director"
-            )
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                text = "Producer: $producer"
-            )
-
+            .padding(horizontal = 16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = "Overview",
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        Text(
+            modifier = Modifier.padding(16.dp),
+            text = movieDetail.overview.toString()
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        var director by remember {
+            mutableStateOf("")
         }
+
+        var producer by remember {
+            mutableStateOf("")
+        }
+
+        movieCredits.crew.forEach {
+            if (it.job == "Producer") {
+                producer += it.name + " "
+            } else if (it.job == "Director") {
+                director += it.name + " "
+            }
+        }
+
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            text = "Director: $director"
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            text = "Producer: $producer"
+        )
+
+    }
 }
 
 @Composable
-fun MovieCast(movieCredits: Credits){
+fun MovieCast(movieCredits: Credits) {
 
     LazyRow(
         contentPadding = PaddingValues(16.dp),
 
-    ) {
-        items(items = movieCredits.cast){ itCast ->
+        ) {
+        items(items = movieCredits.cast) { itCast ->
 
-            itCast.name?.let { CircleItems(name = it, imagePath = IMAGE_URL+itCast.profilePath ) }
+            itCast.name?.let { CircleItems(name = it, imagePath = IMAGE_URL + itCast.profilePath) }
 
         }
 
@@ -603,12 +612,12 @@ fun MovieCast(movieCredits: Credits){
 }
 
 @Composable
-fun MovieCompany(movieDetail: MovieDetail){
+fun MovieCompany(movieDetail: MovieDetail) {
     LazyRow(
         horizontalArrangement = Arrangement.Center
     ) {
-        items(items = movieDetail.productionCompanies){
-            CircleItems(name = it.name.toString(), imagePath = IMAGE_URL+it.logoPath )
+        items(items = movieDetail.productionCompanies) {
+            CircleItems(name = it.name.toString(), imagePath = IMAGE_URL + it.logoPath)
         }
     }
 }

@@ -1,5 +1,8 @@
 package com.github.ebrahimi16153.cinemahub.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -7,6 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,7 +27,6 @@ import com.github.ebrahimi16153.cinemahub.ui.screen.profile.ProfileScreen
 import com.github.ebrahimi16153.cinemahub.ui.screen.saved.SaveScreen
 import com.github.ebrahimi16153.cinemahub.ui.screen.search.SearchScreen
 import com.github.ebrahimi16153.cinemahub.utils.Route
-import com.github.ebrahimi16153.cinemahub.viewmodel.DetailsViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.DiscoverViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
@@ -33,7 +37,6 @@ fun Navigation(
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
     discoverViewModel: DiscoverViewModel,
-    detailsViewModel: DetailsViewModel,
     detailsRepository: DetailsRepository
 ) {
 
@@ -65,7 +68,20 @@ fun Navigation(
     NavHost(navController = navHostController, startDestination = Route.Home.name) {
 
         composable(Route.Home.name) {
-            HomeScreen(navHostController = navHostController, homeViewModel)
+
+            if (genres is Wrapper.Error) {
+
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+                    if ((genres as Wrapper.Error).message.contains("api.themoviedb.org")) {
+                        Text(text = "seems your connection is lost :|")
+                    } else {
+                        Text(text = ((genres as Wrapper.Error).message))
+                    } }
+
+            } else {
+                HomeScreen(navHostController = navHostController, homeViewModel)
+            }
         }
 
         composable(Route.Search.name) {
@@ -103,10 +119,9 @@ fun Navigation(
                     onGridClick = {
                         discoverViewModel.setIsGrid(!isGrid)
                     })
-            }else{
+            } else {
                 MyCircularProgress()
             }
-
 
 
         }
