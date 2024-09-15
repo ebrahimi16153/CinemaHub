@@ -44,6 +44,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.github.ebrahimi16153.cinemahub.R
 import com.github.ebrahimi16153.cinemahub.data.model.Genre
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
+import com.github.ebrahimi16153.cinemahub.ui.componnet.ErrorBox
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GenreItem
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GridMovieItems
 import com.github.ebrahimi16153.cinemahub.ui.componnet.RowMovieItems
@@ -62,8 +63,12 @@ fun DiscoverScreen(
     genres: List<Genre>,
     onGridClick: () -> Unit,
     onGenreClick: (Genre) -> Unit,
-    discoverViewModel: DiscoverViewModel
 ) {
+
+    if (movies.loadState.refresh is LoadState.Error){
+        ErrorBox(message = (movies.loadState.refresh as LoadState.Error).error.message.toString())
+        return
+    }
 
 
     var currentGenreID by remember { mutableIntStateOf(genreID) }

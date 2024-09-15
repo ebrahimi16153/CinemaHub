@@ -22,7 +22,7 @@ class DiscoverRepository @Inject constructor(private val apiServices: ApiService
             val response = apiServices.getGenres()
             when(response.code()){
                 in 200..299 -> {
-                    return flow { response.body()?.genres }
+                    return flow { response.body()?.genres?.let { emit(it) } }
                 }
 
                 in 300..399 -> {

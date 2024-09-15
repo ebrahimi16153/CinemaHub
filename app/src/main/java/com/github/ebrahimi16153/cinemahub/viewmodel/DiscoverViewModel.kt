@@ -30,25 +30,31 @@ class DiscoverViewModel @Inject constructor(private val discoverRepository: Disc
         getGenres()
     }
 
+    ///////////////////////isGrid//////////////////////////////////////////////////////////////////
     val isGrid : MutableState<Boolean> = mutableStateOf(true)
     fun setIsGrid(value:Boolean) = viewModelScope.launch {
         isGrid.value = value
     }
 
 
+    //////////////////////Error////////////////////////////////////////////////////////////////////
+    private val _error  = MutableStateFlow<Wrapper<String>>(Wrapper.Idle)
+    val error : StateFlow<Wrapper<String>> = _error
+
+    /////////////////////Genre/////////////////////////////////////////////////////////////////////
     private val _genres = MutableStateFlow<Wrapper<List<Genre>>>(Wrapper.Loading)
     val genres: StateFlow<Wrapper<List<Genre>>> = _genres
 
 
     private fun getGenres() = viewModelScope.launch {
         try {
-            discoverRepository.getGenresList().catch { itException ->
-                Wrapper.Error(message = itException.message.toString())
-            }.collectLatest { itGenres ->
+            discoverRepository.getGenresList().collectLatest { itGenres ->
+                _error.value = Wrapper.Idle
                 _genres.value = Wrapper.Success(data = itGenres)
             }
         }catch (e:Exception){
-            _genres.value = Wrapper.Error(message = e.message.toString())
+            _genres.value = Wrapper.Idle
+            _error.value = Wrapper.Error(message = e.message.toString())
         }
 
     }

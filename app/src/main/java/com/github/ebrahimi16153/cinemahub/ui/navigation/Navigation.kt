@@ -44,7 +44,7 @@ fun Navigation(
 
     /** ************************important note******************************************************
      *
-     *  for Save and retain LazyColumn scroll position while using Paging 3
+     *           for Save and retain LazyColumn scroll position while using Paging 3
      *
      * 1>> we have to declare items as CollectAsLazyPagingItems() in before declaring your NavHost
      * 2>> for get items from ViewModel we have to use LaunchEffect and collectAsLazyPagingItems()
@@ -69,19 +69,7 @@ fun Navigation(
 
         composable(Route.Home.name) {
 
-            if (genres is Wrapper.Error) {
-
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-
-                    if ((genres as Wrapper.Error).message.contains("api.themoviedb.org")) {
-                        Text(text = "seems your connection is lost :|")
-                    } else {
-                        Text(text = ((genres as Wrapper.Error).message))
-                    } }
-
-            } else {
                 HomeScreen(navHostController = navHostController, homeViewModel)
-            }
         }
 
         composable(Route.Search.name) {
@@ -100,12 +88,12 @@ fun Navigation(
 
 
         composable(Route.Discover.name + "/{genreID}/{genreName}") { backStackEntry ->
+
             genreId = backStackEntry.arguments?.getString("genreID") ?: "-1"
             genreName = backStackEntry.arguments?.getString("genreName") ?: ""
 
             if (discoverMovies.loadState.refresh !is LoadState.Loading) {
                 DiscoverScreen(
-                    discoverViewModel = discoverViewModel,
                     navHostController = navHostController,
                     genreName = genreName,
                     genreID = genreId.toInt(),

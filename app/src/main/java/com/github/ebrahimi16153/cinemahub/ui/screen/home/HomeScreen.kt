@@ -45,6 +45,7 @@ import com.github.ebrahimi16153.cinemahub.data.model.Genre
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
 import com.github.ebrahimi16153.cinemahub.ui.componnet.BannerItems
+import com.github.ebrahimi16153.cinemahub.ui.componnet.ErrorBox
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GenreItem
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GridMovieItems
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyCircularProgress
@@ -69,49 +70,59 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
+    // check loading, error or empty Items
+    when {
+        movies is Wrapper.Loading || genres is Wrapper.Loading ||
+                nowPlayingMovieList is Wrapper.Loading || topRateMovie is Wrapper.Loading ||
+                popularMovie is Wrapper.Loading || upcomingMovie is Wrapper.Loading
+        -> { MyCircularProgress()}
 
-    if (movies is Wrapper.Loading || genres is Wrapper.Loading ||
-        nowPlayingMovieList is Wrapper.Loading || topRateMovie is Wrapper.Loading ||
-        popularMovie is Wrapper.Loading || upcomingMovie is Wrapper.Loading) {
+        error is Wrapper.Error -> { 
+            if ((error as Wrapper.Error).message.contains("api.themoviedb.org")){
+                ErrorBox(message = "seems server Unavailable\ncheck your Internet")
+            }else{
 
-        MyCircularProgress()
-
-    } else {
-        if (error is Wrapper.Error){
-            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                Text(text = (error as Wrapper.Error).message.toString())
-            }
-        }else{
-
-            if (isLandscape) {
-
-                //landscape design
-                LandscapeHome(
-                    navHostController = navHostController,
-                    mainBannerMovies = (movies as Wrapper.Success).data,
-                    nowPlayingMovieList = (nowPlayingMovieList as Wrapper.Success).data,
-                    topRateMovie = (topRateMovie as Wrapper.Success).data,
-                    popularMovie = (popularMovie as Wrapper.Success).data,
-                    upcomingMovie = (upcomingMovie as Wrapper.Success).data,
-                    genres = (genres as Wrapper.Success).data
-                )
-
-            } else {
-
-                // portrait design
-                PortraitHome(
-                    navHostController = navHostController,
-                    mainBannerMovies = (movies as Wrapper.Success).data,
-                    nowPlayingMovieList = (nowPlayingMovieList as Wrapper.Success).data,
-                    topRateMovie = (topRateMovie as Wrapper.Success).data,
-                    popularMovie = (popularMovie as Wrapper.Success).data,
-                    upcomingMovie = (upcomingMovie as Wrapper.Success).data,
-                    genres = (genres as Wrapper.Success).data
-                )
+                ErrorBox(message = (error as Wrapper.Error).message)
             }
         }
 
+        else -> { // Use 'else' instead of nested 'if'
+            val safeMovies = (movies as? Wrapper.Success)?.data
+            val safeGenres = (genres as? Wrapper.Success)?.data
+            val safeNowPlaying = (nowPlayingMovieList as? Wrapper.Success)?.data
+            val safeTopRate = (topRateMovie as? Wrapper.Success)?.data
+            val safePopular = (popularMovie as? Wrapper.Success)?.data
+            val safeUpcoming = (upcomingMovie as? Wrapper.Success)?.data
 
+            if (safeMovies != null && safeGenres != null && safeNowPlaying != null &&
+                safeTopRate != null && safePopular != null && safeUpcoming != null
+            ) {
+                // All data is available, choose layout based on orientation
+                if (isLandscape) {
+                    LandscapeHome(
+                        navHostController = navHostController,
+                        mainBannerMovies = safeMovies,
+                        nowPlayingMovieList = safeNowPlaying,
+                        genres = safeGenres,
+                        popularMovie = safePopular,
+                        topRateMovie = safeTopRate,
+                        upcomingMovie = safeUpcoming
+                    )
+                } else {
+                    PortraitHome(
+                        navHostController = navHostController,
+                        mainBannerMovies = safeMovies,
+                        nowPlayingMovieList = safeNowPlaying,
+                        genres = safeGenres,
+                        popularMovie = safePopular,
+                        topRateMovie = safeTopRate,
+                        upcomingMovie = safeUpcoming
+                    )
+                }
+            } else {
+                // Handle case where some data is still null (if necessary)
+            }
+        }
     }
 }
 
@@ -325,9 +336,9 @@ fun HorizontalMovieList(movies: List<Movie>, onMovieClick: (Int) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Spacing between items
     ) {
 
-        itemsIndexed(items = movies, key = { _, movie -> movie.id!! }) { _, itMovie ->
+        itemsIndexed(items = movies, key = { _, movie -> movie.id }) { _, itMovie ->
 
-            GridMovieItems(movie = itMovie, onMovieClick = { onMovieClick(itMovie.id!!) })
+            GridMovieItems(movie = itMovie, onMovieClick = { onMovieClick(itMovie.id) })
 
         }
     }

@@ -16,35 +16,34 @@ class HomeRepository @Inject constructor(private val apiServices: ApiServices) {
     suspend fun trendingMovie(): Flow<List<Movie>> {
         try {
             val response = apiServices.getTrendingMovie()
-            return if (response.isSuccessful){
-                flow { response.body()?.let { emit(it.results) } }
-            }else{
-                flow { emptyList<List<Movie>>() }
+
+            when(response.code()){
+                200 -> { return flow { emit(response.body()?.results?: emptyList()) }}
+                in 300..399 -> {throw Exception("Error code 300")}
+                in 400..499 -> {throw Exception("Error code 400")}
+                in 500..599 -> {throw Exception("Error code 500")}
+                else -> {throw Exception("Unknown Error")}
             }
         }catch (e:Exception){
-            Log.e("Tag",e.message.toString())
-
+            throw e
         }
-
-        return emptyFlow()
     }
 
 
     suspend fun nowPlayingMovie(): Flow<List<Movie>> {
         try {
             val response = apiServices.getNowPlayingMovies()
-            return if (response.isSuccessful){
-                flow { response.body()?.let { emit(it.results) } }
-            }else{
-                flow { emptyList<List<Movie>>() }
+            when(response.code()){
+                200 -> { return flow { emit(response.body()?.results?: emptyList()) }}
+                in 300..399 -> {throw Exception("Error code 300")}
+                in 400..499 -> {throw Exception("Error code 400")}
+                in 500..599 -> {throw Exception("Error code 500")}
+                else -> {throw Exception("Unknown Error")}
             }
+
         }catch (e:Exception){
-            Log.e("Tag",e.message.toString())
-
+            throw e
         }
-
-        return emptyFlow()
-
     }
 
 
@@ -52,17 +51,16 @@ class HomeRepository @Inject constructor(private val apiServices: ApiServices) {
 
         try {
             val response = apiServices.getTopRatedMovie()
-            return if (response.isSuccessful){
-                flow { response.body()?.let { emit(it.results) } }
-            }else{
-                flow { emptyList<List<Movie>>() }
+            when(response.code()){
+                200 -> { return flow { emit(response.body()?.results?: emptyList()) }}
+                in 300..399 -> {throw Exception("Error code 300")}
+                in 400..499 -> {throw Exception("Error code 400")}
+                in 500..599 -> {throw Exception("Error code 500")}
+                else -> {throw Exception("Unknown Error")}
             }
         }catch (e:Exception){
-            Log.e("Tag",e.message.toString())
-
+            throw e
         }
-
-        return emptyFlow()
     }
 
 
@@ -71,16 +69,17 @@ class HomeRepository @Inject constructor(private val apiServices: ApiServices) {
 
         try {
             val response = apiServices.getPopularMovie()
-            return if (response.isSuccessful){
-                flow { response.body()?.let { emit(it.results) } }
-            }else{
-                flow { emptyList<List<Movie>>() }
+            when(response.code()){
+                200 -> { return flow { emit(response.body()?.results?: emptyList()) }}
+                in 300..399 -> {throw Exception("Error code 300")}
+                in 400..499 -> {throw Exception("Error code 400")}
+                in 500..599 -> {throw Exception("Error code 500")}
+                else -> {throw Exception("Unknown Error")}
             }
-        }catch (e:Exception){
-            Log.e("Tag",e.message.toString())
 
+        }catch (e:Exception){
+          throw e
         }
-        return emptyFlow()
     }
 
 
@@ -90,32 +89,32 @@ class HomeRepository @Inject constructor(private val apiServices: ApiServices) {
 
         try {
             val response = apiServices.getUpcomingMovies()
-            return if (response.isSuccessful){
-                flow { response.body()?.let { emit(it.results) } }
-            }else{
-                flow { emptyList<List<Movie>>() }
+            when(response.code()){
+                200 -> { return flow { emit(response.body()?.results?: emptyList()) }}
+                in 300..399 -> {throw Exception("Error code 300")}
+                in 400..499 -> {throw Exception("Error code 400")}
+                in 500..599 -> {throw Exception("Error code 500")}
+                else -> {throw Exception("Unknown Error")}
             }
-        }catch (e:Exception){
-            Log.e("Tag",e.message.toString())
 
+        }catch (e:Exception){
+            throw e
         }
-        return emptyFlow()
     }
 
 
     suspend fun getGenresList():Flow<List<Genre>>{
         try {
             val response = apiServices.getGenres()
-            return if (response.isSuccessful){
-                flow {
-                    response.body()?.let { emit(it.genres) }
-                }
-            }else{
-                flow { emptyList<List<Genre>>() }
+            when(response.code()){
+                200 -> { return flow { emit(response.body()?.genres?: emptyList())}}
+                in 300..399 -> {throw Exception("Error code 300")}
+                in 400..499 -> {throw Exception("Error code 400")}
+                in 500..599 -> {throw Exception("Error code 500")}
+                else -> {throw Exception("Unknown Error")}
             }
         }catch (e:Exception){
-            Log.e("Tag",e.message.toString())
+            throw e
         }
-        return emptyFlow()
     }
 }

@@ -23,10 +23,11 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(private val homeRepository: HomeRepository) : ViewModel() {
 
 
+
+
+
+
     init {
-        try {
-
-
             //get movies
             getNowPlayingMovies()
             getTopRateMovie()
@@ -34,17 +35,12 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
             getUpcomingMovie()
             getMovieOFBanner()
             getGenres()
-        }catch (e:Exception){
-            Log.e("TAG",e.message.toString())
-        }
-
-
     }
+
 
     //////////////////////////Error///////////////////////////////////
     private val _error = MutableStateFlow<Wrapper<String>>(Wrapper.Idle)
-     val error: StateFlow<Wrapper<String>> = _error
-
+    val error: StateFlow<Wrapper<String>> = _error
 
     ///////////////////////////////Genres////////////////////////////
     private val _genres = MutableStateFlow<Wrapper<List<Genre>>>(Wrapper.Loading)
@@ -53,16 +49,12 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
 
     private fun getGenres() = viewModelScope.launch {
         try {
-            homeRepository.getGenresList().catch { itException ->
-
-                _error.value = Wrapper.Error(message = itException.message.toString())
-
-            }.collectLatest { itGenres ->
+            homeRepository.getGenresList().collectLatest { itGenres ->
                 _genres.value = Wrapper.Success(data = itGenres)
             }
 
-
         } catch (e: Exception) {
+            _genres.value = Wrapper.Idle
             _error.value = Wrapper.Error(message = e.message.toString())
         }
 
@@ -76,16 +68,13 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
 
     private fun getMovieOFBanner() = viewModelScope.launch {
         try {
-            homeRepository.getTopRatedMovie().catch { itException ->
-
-                _error.value = Wrapper.Error(message = itException.message.toString())
-
-            }.collectLatest { itMovies ->
+            homeRepository.getTopRatedMovie().collectLatest { itMovies ->
                 _movieOfBanner.value = Wrapper.Success(data = itMovies)
                 _error.value = Wrapper.Idle
             }
 
         } catch (e: Exception) {
+            _movieOfBanner.value = Wrapper.Idle
             _error.value = Wrapper.Error(message = e.message.toString())
         }
     }
@@ -97,16 +86,13 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     private fun getNowPlayingMovies() = viewModelScope.launch {
 
         try {
-            homeRepository.nowPlayingMovie().catch { itException ->
-
-                _error.value = Wrapper.Error(message = itException.message.toString())
-
-            }.collectLatest { itMovies ->
+            homeRepository.nowPlayingMovie().collectLatest { itMovies ->
                 _nowPlayingMovie.value = Wrapper.Success(data = itMovies)
                 _error.value = Wrapper.Idle
             }
 
         } catch (e: Exception) {
+            _nowPlayingMovie.value = Wrapper.Idle
             _error.value = Wrapper.Error(message = e.message.toString())
         }
 
@@ -120,15 +106,12 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     private fun getTopRateMovie() = viewModelScope.launch {
 
         try {
-            homeRepository.getTopRatedMovie().catch { itException ->
-
-                _error.value = Wrapper.Error(message = itException.message.toString())
-
-            }.collectLatest { itMovies ->
+            homeRepository.getTopRatedMovie().collectLatest { itMovies ->
                 _topRateMovie.value = Wrapper.Success(data = itMovies)
                 _error.value = Wrapper.Idle
             }
         } catch (e: Exception) {
+            _topRateMovie.value = Wrapper.Idle
             _error.value = Wrapper.Error(message = e.message.toString())
         }
 
@@ -143,15 +126,12 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     private fun getPopularMovie() = viewModelScope.launch {
 
         try {
-            homeRepository.getPopularMovie().catch { itException ->
-
-                _error.value = Wrapper.Error(message = itException.message.toString())
-
-            }.collectLatest { itMovies ->
+            homeRepository.getPopularMovie().collectLatest { itMovies ->
                 _popularMovie.value = Wrapper.Success(data = itMovies)
                 _error.value = Wrapper.Idle
             }
         } catch (e: Exception) {
+            _popularMovie.value = Wrapper.Idle
             _error.value = Wrapper.Error(message = e.message.toString())
         }
 
@@ -164,17 +144,12 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     private fun getUpcomingMovie() = viewModelScope.launch {
 
         try {
-            homeRepository.getUpcomingMovie()
-                .catch { itException ->
-
-                    _error.value = Wrapper.Error(message = itException.message.toString())
-
-                }
-                .collectLatest { itMovies ->
+            homeRepository.getUpcomingMovie().collectLatest { itMovies ->
                     _upcomingMovie.value = Wrapper.Success(data = itMovies)
                     _error.value = Wrapper.Idle
                 }
         } catch (e: Exception) {
+            _upcomingMovie.value = Wrapper.Idle
             _error.value = Wrapper.Error(message = e.message.toString())
         }
 
