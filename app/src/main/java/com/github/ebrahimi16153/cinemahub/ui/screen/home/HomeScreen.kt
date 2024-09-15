@@ -27,7 +27,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +42,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.room.Query
 import com.github.ebrahimi16153.cinemahub.R
 import com.github.ebrahimi16153.cinemahub.data.model.Genre
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
@@ -53,7 +55,22 @@ import com.github.ebrahimi16153.cinemahub.utils.Route
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 
 @Composable
-fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewModel) {
+fun HomeScreen(
+    navHostController: NavHostController,
+    homeViewModel: HomeViewModel,
+    recomposeScope: RecomposeScope
+) {
+
+     LaunchedEffect(key1 = true) {
+         homeViewModel.apply {
+             getNowPlayingMovies()
+             getTopRateMovie()
+             getPopularMovie()
+             getUpcomingMovie()
+             getMovieOFBanner()
+             getGenres()
+         }
+     }
 
 
     ////////////////////getData////////////////////////////////////////////////////
@@ -77,12 +94,29 @@ fun HomeScreen(navHostController: NavHostController, homeViewModel: HomeViewMode
                 popularMovie is Wrapper.Loading || upcomingMovie is Wrapper.Loading
         -> { MyCircularProgress()}
 
-        error is Wrapper.Error -> { 
+        error is Wrapper.Error -> {
             if ((error as Wrapper.Error).message.contains("api.themoviedb.org")){
-                ErrorBox(message = "seems server Unavailable\ncheck your Internet")
+                ErrorBox(message = "seems server Unavailable\ncheck your Internet", onRefreshClick = {
+                    homeViewModel.apply {
+                        getNowPlayingMovies()
+                        getTopRateMovie()
+                        getPopularMovie()
+                        getUpcomingMovie()
+                        getMovieOFBanner()
+                        getGenres()
+                    }
+                })
             }else{
 
-                ErrorBox(message = (error as Wrapper.Error).message)
+                ErrorBox(message = (error as Wrapper.Error).message, onRefreshClick = {
+                    homeViewModel.apply {
+                        getNowPlayingMovies()
+                        getTopRateMovie()
+                        getPopularMovie()
+                        getUpcomingMovie()
+                        getMovieOFBanner()
+                    }
+                })
             }
         }
 

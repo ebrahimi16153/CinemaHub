@@ -1,17 +1,13 @@
 package com.github.ebrahimi16153.cinemahub.ui.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -63,13 +59,14 @@ fun Navigation(
 
     val discoverMovies = discoverViewModel.moviesByGenre.collectAsLazyPagingItems()
     val genres by discoverViewModel.genres.collectAsState()
+    val recomposeScope = currentRecomposeScope
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     NavHost(navController = navHostController, startDestination = Route.Home.name) {
 
         composable(Route.Home.name) {
 
-                HomeScreen(navHostController = navHostController, homeViewModel)
+                HomeScreen(navHostController = navHostController, homeViewModel, recomposeScope = recomposeScope)
         }
 
         composable(Route.Search.name) {

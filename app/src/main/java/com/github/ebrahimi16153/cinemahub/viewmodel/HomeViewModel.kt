@@ -22,22 +22,6 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val homeRepository: HomeRepository) : ViewModel() {
 
-
-
-
-
-
-    init {
-            //get movies
-            getNowPlayingMovies()
-            getTopRateMovie()
-            getPopularMovie()
-            getUpcomingMovie()
-            getMovieOFBanner()
-            getGenres()
-    }
-
-
     //////////////////////////Error///////////////////////////////////
     private val _error = MutableStateFlow<Wrapper<String>>(Wrapper.Idle)
     val error: StateFlow<Wrapper<String>> = _error
@@ -47,7 +31,8 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     val genres: StateFlow<Wrapper<List<Genre>>> = _genres
 
 
-    private fun getGenres() = viewModelScope.launch {
+    fun getGenres() = viewModelScope.launch {
+        _genres.value = Wrapper.Loading
         try {
             homeRepository.getGenresList().collectLatest { itGenres ->
                 _genres.value = Wrapper.Success(data = itGenres)
@@ -66,9 +51,10 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     val movieOfBanner: StateFlow<Wrapper<List<Movie>>> = _movieOfBanner
 
 
-    private fun getMovieOFBanner() = viewModelScope.launch {
+    fun getMovieOFBanner() = viewModelScope.launch {
+        _movieOfBanner.value = Wrapper.Loading
         try {
-            homeRepository.getTopRatedMovie().collectLatest { itMovies ->
+            homeRepository.trendingMovie().collectLatest { itMovies ->
                 _movieOfBanner.value = Wrapper.Success(data = itMovies)
                 _error.value = Wrapper.Idle
             }
@@ -83,9 +69,11 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     private val _nowPlayingMovie = MutableStateFlow<Wrapper<List<Movie>>>(Wrapper.Loading)
     val nowPlayingMovie: StateFlow<Wrapper<List<Movie>>> = _nowPlayingMovie
 
-    private fun getNowPlayingMovies() = viewModelScope.launch {
+    fun getNowPlayingMovies() = viewModelScope.launch {
+        _nowPlayingMovie.value = Wrapper.Loading
 
         try {
+            _nowPlayingMovie.value = Wrapper.Loading
             homeRepository.nowPlayingMovie().collectLatest { itMovies ->
                 _nowPlayingMovie.value = Wrapper.Success(data = itMovies)
                 _error.value = Wrapper.Idle
@@ -93,7 +81,7 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
 
         } catch (e: Exception) {
             _nowPlayingMovie.value = Wrapper.Idle
-            _error.value = Wrapper.Error(message = e.message.toString())
+            _error.value = Wrapper.Error(message = e.message ?: "unknown error")
         }
 
     }
@@ -103,7 +91,8 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     private val _topRateMovie = MutableStateFlow<Wrapper<List<Movie>>>(Wrapper.Loading)
     val topRateMovie: StateFlow<Wrapper<List<Movie>>> = _topRateMovie
 
-    private fun getTopRateMovie() = viewModelScope.launch {
+    fun getTopRateMovie() = viewModelScope.launch {
+        _topRateMovie.value = Wrapper.Loading
 
         try {
             homeRepository.getTopRatedMovie().collectLatest { itMovies ->
@@ -123,7 +112,8 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     private val _popularMovie = MutableStateFlow<Wrapper<List<Movie>>>(Wrapper.Loading)
     val popularMovie: StateFlow<Wrapper<List<Movie>>> = _popularMovie
 
-    private fun getPopularMovie() = viewModelScope.launch {
+    fun getPopularMovie() = viewModelScope.launch {
+        _popularMovie.value = Wrapper.Loading
 
         try {
             homeRepository.getPopularMovie().collectLatest { itMovies ->
@@ -141,13 +131,14 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     private val _upcomingMovie = MutableStateFlow<Wrapper<List<Movie>>>(Wrapper.Loading)
     val upcomingMovie: StateFlow<Wrapper<List<Movie>>> = _upcomingMovie
 
-    private fun getUpcomingMovie() = viewModelScope.launch {
+    fun getUpcomingMovie() = viewModelScope.launch {
+        _upcomingMovie.value = Wrapper.Loading
 
         try {
             homeRepository.getUpcomingMovie().collectLatest { itMovies ->
-                    _upcomingMovie.value = Wrapper.Success(data = itMovies)
-                    _error.value = Wrapper.Idle
-                }
+                _upcomingMovie.value = Wrapper.Success(data = itMovies)
+                _error.value = Wrapper.Idle
+            }
         } catch (e: Exception) {
             _upcomingMovie.value = Wrapper.Idle
             _error.value = Wrapper.Error(message = e.message.toString())

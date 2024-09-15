@@ -28,6 +28,7 @@ import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
@@ -66,8 +67,9 @@ fun DiscoverScreen(
 ) {
 
     if (movies.loadState.refresh is LoadState.Error){
-        ErrorBox(message = (movies.loadState.refresh as LoadState.Error).error.message.toString())
-        return
+        ErrorBox(message = (movies.loadState.refresh as LoadState.Error).error.message.toString(), onRefreshClick = {
+            movies.refresh()
+        })
     }
 
 
