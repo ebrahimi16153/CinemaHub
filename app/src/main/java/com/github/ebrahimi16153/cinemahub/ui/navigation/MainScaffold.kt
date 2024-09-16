@@ -24,7 +24,6 @@ fun MainScaffold(
     searchViewModel: SearchViewModel,
     discoverViewModel: DiscoverViewModel,
     detailsViewModel: DetailsViewModel,
-    detailsRepository: DetailsRepository
 ) {
 
     Scaffold(
@@ -50,7 +49,7 @@ fun MainScaffold(
                 homeViewModel = homeViewModel,
                 searchViewModel = searchViewModel,
                 discoverViewModel = discoverViewModel,
-                detailsRepository = detailsRepository
+                detailsViewModel = detailsViewModel
             )
 
         }

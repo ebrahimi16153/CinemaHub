@@ -36,9 +36,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,17 +63,25 @@ import com.github.ebrahimi16153.cinemahub.data.model.Trailers
 import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
 import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
 import com.github.ebrahimi16153.cinemahub.ui.componnet.CircleItems
+import com.github.ebrahimi16153.cinemahub.ui.componnet.ErrorBox
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyCircularProgress
 import com.github.ebrahimi16153.cinemahub.utils.IMAGE_URL
+import com.github.ebrahimi16153.cinemahub.utils.findDirector
+import com.github.ebrahimi16153.cinemahub.utils.findProducer
+import com.github.ebrahimi16153.cinemahub.viewmodel.DetailsViewModel
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun Details(
     movieID: Int,
     navHostController: NavHostController,
-    detailsRepository: DetailsRepository
+    detailsViewModel: DetailsViewModel
 ) {
 
 
@@ -82,97 +93,60 @@ fun Details(
      */
 
 
-    val movieDetail: MutableState<Wrapper<MovieDetail?>> = remember {
-        mutableStateOf(Wrapper.Loading)
-    }
 
-    val movieImages: MutableState<Wrapper<List<MovieImages.Poster>>> = remember {
-        mutableStateOf(Wrapper.Loading)
-    }
+    val movieDetail = detailsViewModel.movieDetail.collectAsState()
 
-    val movieTrailers: MutableState<Wrapper<List<Trailers.Trailer>>> = remember {
-        mutableStateOf(Wrapper.Loading)
-    }
+    val movieImages = detailsViewModel.movieImages.collectAsState()
 
-    val movieCredits: MutableState<Wrapper<Credits>> = remember {
-        mutableStateOf(Wrapper.Loading)
-    }
+    val movieTrailers = detailsViewModel.trailers.collectAsState()
+
+    val movieCredits = detailsViewModel.credits.collectAsState()
+
+    val error = detailsViewModel.error.collectAsState()
 
 
     LaunchedEffect(key1 = true) {
 
-        detailsRepository.getMovieDetailsByMovieID(movieID).collect { itMovieDetail ->
-            movieDetail.value = Wrapper.Success(data = itMovieDetail)
-        }
+            detailsViewModel.getMovieDetail(movieID)
 
-        detailsRepository.getMovieImages(movieID = movieID).collect { itImages ->
-            if (itImages != null) {
-                movieImages.value = Wrapper.Success(data = itImages.posters)
-            }
-        }
+            detailsViewModel.getMovieImages(movieID )
 
-        detailsRepository.getMovieTrailers(movieID).collect {
-            if (it != null) {
-                movieTrailers.value = Wrapper.Success(data = it.results)
+            detailsViewModel.getMovieTrailers(movieID)
 
-            }
-        }
+            detailsViewModel.getMovieCredits(movieID)
 
-        detailsRepository.getCredits(movieID).collect { itCredits ->
-            itCredits?.let { it2 ->
-                movieCredits.value = Wrapper.Success(data = it2)
-            }
-        }
+
     }
 
+    when(error.value){
+        is Wrapper.Error -> {
+            ErrorBox(message = (error.value as Wrapper.Error).message) {
+                detailsViewModel.apply {
+                    getMovieDetail(movieID)
+                    getMovieImages(movieID)
+                    getMovieTrailers(movieID)
+                    getMovieCredits(movieID)
+                }
+            }
+        }
+        Wrapper.Idle -> {
 
-//    when (movieImages.value) {
-//        is Wrapper.Error -> {
-//            Text(text = (movieImages.value as Wrapper.Error).message)
-//        }
-//
-//        Wrapper.Idle -> {}
-//        Wrapper.Loading -> {
-//            MyCircularProgress()
-//        }
-//
-//        is Wrapper.Success -> {
-//
-//
-//            movieDetail.value?.let {
-//
-//                if (movieTrailers.value is Wrapper.Success) {
-//
-//                    movieCredits.value?.let { it1 ->
-//                        DetailsOrientation(
-//                            movieDetail = it,
-//                            posters = (movieImages.value as Wrapper.Success).data,
-//                            trailers = (movieTrailers.value as Wrapper.Success).data,
-//                            movieCredits = it1,
-//                            navHostController = navHostController
-//                        )
-//                    }
-//                }
-//
-//
-//            }
-//
-//        }
-//    }
+            if (movieDetail.value is Wrapper.Loading || movieImages.value is Wrapper.Loading || movieTrailers.value is Wrapper.Loading || movieCredits.value is Wrapper.Loading){
+                MyCircularProgress()
+            }else if (movieDetail.value is Wrapper.Success && movieImages.value is Wrapper.Success && movieTrailers.value is Wrapper.Success && movieCredits.value is Wrapper.Success){
+                DetailsOrientation(
+                    movieDetail = (movieDetail.value as Wrapper.Success).data,
+                    posters = (movieImages.value as Wrapper.Success).data,
+                    trailers =( movieTrailers.value as Wrapper.Success).data ,
+                    navHostController =navHostController ,
+                    movieCredits =( movieCredits.value as Wrapper.Success).data
+                )
+            }
 
 
-    if (movieDetail.value is Wrapper.Loading || movieTrailers.value is Wrapper.Loading || movieImages.value is Wrapper.Loading || movieCredits.value is Wrapper.Loading) {
-
-        MyCircularProgress()
-
-    } else {
-        DetailsOrientation(
-            movieDetail = (movieDetail.value as Wrapper.Success).data!!,
-            posters = (movieImages.value as Wrapper.Success).data,
-            trailers = (movieTrailers.value as Wrapper.Success).data,
-            movieCredits = (movieCredits.value as Wrapper.Success).data,
-            navHostController = navHostController
-        )
+        }
+        Wrapper.Loading ->{}
+        is Wrapper.Success -> {}
     }
 
 
@@ -560,33 +534,21 @@ fun MovieIfo(movieDetail: MovieDetail, movieCredits: Credits) {
             text = movieDetail.overview.toString()
         )
         Spacer(modifier = Modifier.height(5.dp))
-        var director by remember {
-            mutableStateOf("")
-        }
 
-        var producer by remember {
-            mutableStateOf("")
-        }
 
-        movieCredits.crew.forEach {
-            if (it.job == "Producer") {
-                producer += it.name + " "
-            } else if (it.job == "Director") {
-                director += it.name + " "
-            }
-        }
+
 
         Text(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            text = "Director: $director"
+            text = "Director: ${movieCredits.crew.findDirector()}"
         )
         Text(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            text = "Producer: $producer"
+            text = "Producer: ${movieCredits.crew.findProducer()}"
         )
 
     }

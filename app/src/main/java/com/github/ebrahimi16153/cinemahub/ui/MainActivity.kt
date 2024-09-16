@@ -60,7 +60,6 @@ fun CinemaHub(
             homeViewModel = homeViewModel,
             searchViewModel = searchViewModel,
             discoverViewModel = discoverViewModel,
-            detailsViewModel = detailsViewModel,
-            detailsRepository = detailsRepository)
+            detailsViewModel = detailsViewModel)
     }
 }
