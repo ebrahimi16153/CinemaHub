@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.ebrahimi16153.cinemahub.data.model.Credits
 import com.github.ebrahimi16153.cinemahub.data.model.ImageCollection
+import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetail
 import com.github.ebrahimi16153.cinemahub.data.model.MovieImages
 import com.github.ebrahimi16153.cinemahub.data.model.Trailers
@@ -20,6 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel @Inject constructor(private val detailsRepository: DetailsRepository) :
     ViewModel() {
+
+        //////////////////////////////////API/////////////////////////////////////////////////
 
     ////////////////////////////////////////error////////////////////////////////////////////////
 
@@ -100,4 +103,33 @@ class DetailsViewModel @Inject constructor(private val detailsRepository: Detail
             _error.value = Wrapper.Error(message = e.message.toString())
         }
     }
+
+
+    ////////////////////////////////////////DATABASE//////////////////////////////////////////////
+
+    //////////////////////////////////////////movie exist?//////////////////////////////////////
+
+    private val _isMovieExist = MutableStateFlow<Boolean>(false)
+    val isMovieExist :StateFlow<Boolean> = _isMovieExist
+
+    fun getIsMovieExist(movieID:Int) = viewModelScope.launch {
+        detailsRepository.movieEXIST(movieID).collect{ itBoolean ->
+            _isMovieExist.value = itBoolean
+        }
+    }
+
+    //////////////////////////////////////////insert Movie////////////////////////////////////////
+
+    fun saveMovie(movie:MovieDetail) = viewModelScope.launch {
+        detailsRepository.saveMovie(movie)
+    }
+
+    ////////////////////////////////////////deleteMovie///////////////////////////////////////////
+    fun deleteMovie(movie: MovieDetail) = viewModelScope.launch {
+        detailsRepository.deleteMovie(movie)
+    }
+
+
+
+
 }

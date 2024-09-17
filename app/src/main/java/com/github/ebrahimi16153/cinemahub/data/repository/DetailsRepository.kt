@@ -1,6 +1,8 @@
 package com.github.ebrahimi16153.cinemahub.data.repository
 
+import com.github.ebrahimi16153.cinemahub.data.local.MovieDao
 import com.github.ebrahimi16153.cinemahub.data.model.Credits
+import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetail
 import com.github.ebrahimi16153.cinemahub.data.model.MovieImages
 import com.github.ebrahimi16153.cinemahub.data.model.Trailers
@@ -10,8 +12,13 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class DetailsRepository @Inject constructor(private val apiServices: ApiServices) {
+class DetailsRepository @Inject constructor(
+    private val apiServices: ApiServices,
+    private val movieDao: MovieDao
+) {
 
+
+    //////////////////////////////////////API//////////////////////////////////////////////////
     suspend fun getMovieDetailsByMovieID(movieID: Int): Flow<MovieDetail> {
         try {
             val response = apiServices.getMovieDetailByID(movieID)
@@ -91,13 +98,16 @@ class DetailsRepository @Inject constructor(private val apiServices: ApiServices
                     else
                         emptyFlow()
                 }
-                in 300..399 ->{
+
+                in 300..399 -> {
                     throw Exception("Error code 300")
                 }
-                in 400..499 ->{
+
+                in 400..499 -> {
                     throw Exception("Error code 400")
                 }
-                in 500..599 ->{
+
+                in 500..599 -> {
                     throw Exception("Error code 500")
                 }
 
@@ -111,7 +121,7 @@ class DetailsRepository @Inject constructor(private val apiServices: ApiServices
         }
     }
 
-    suspend fun getCredits(movieID: Int) :Flow<Credits>{
+    suspend fun getCredits(movieID: Int): Flow<Credits> {
 
         try {
             val response = apiServices.getCreditsByMovieID(movieID)
@@ -122,13 +132,16 @@ class DetailsRepository @Inject constructor(private val apiServices: ApiServices
                     else
                         emptyFlow()
                 }
-                in 300..399 ->{
+
+                in 300..399 -> {
                     throw Exception("Error code 300")
                 }
-                in 400..499 ->{
+
+                in 400..499 -> {
                     throw Exception("Error code 400")
                 }
-                in 500..599 ->{
+
+                in 500..599 -> {
                     throw Exception("Error code 500")
                 }
 
@@ -141,4 +154,11 @@ class DetailsRepository @Inject constructor(private val apiServices: ApiServices
             throw e
         }
     }
+
+    ///////////////////////////////////DATABASE//////////////////////////////////////////////////
+    fun movieEXIST(movieID: Int) = movieDao.existsMovie(movieID)
+
+    suspend fun saveMovie(movie: MovieDetail) = movieDao.insertMovie(movie)
+
+    suspend fun deleteMovie(movie: MovieDetail) = movieDao.deleteMovie(movie)
 }

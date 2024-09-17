@@ -9,12 +9,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyNavigationBar
 import com.github.ebrahimi16153.cinemahub.utils.Route
 import com.github.ebrahimi16153.cinemahub.viewmodel.DetailsViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.DiscoverViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
+import com.github.ebrahimi16153.cinemahub.viewmodel.SavedViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
 
 @Composable
@@ -24,6 +24,7 @@ fun MainScaffold(
     searchViewModel: SearchViewModel,
     discoverViewModel: DiscoverViewModel,
     detailsViewModel: DetailsViewModel,
+    savedViewModel: SavedViewModel,
 ) {
 
     Scaffold(
@@ -49,7 +50,8 @@ fun MainScaffold(
                 homeViewModel = homeViewModel,
                 searchViewModel = searchViewModel,
                 discoverViewModel = discoverViewModel,
-                detailsViewModel = detailsViewModel
+                detailsViewModel = detailsViewModel,
+                savedViewModel = savedViewModel
             )
 
         }

@@ -13,7 +13,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
 import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
 import com.github.ebrahimi16153.cinemahub.ui.componnet.MyCircularProgress
 import com.github.ebrahimi16153.cinemahub.ui.screen.details.Details
@@ -26,6 +25,7 @@ import com.github.ebrahimi16153.cinemahub.utils.Route
 import com.github.ebrahimi16153.cinemahub.viewmodel.DetailsViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.DiscoverViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
+import com.github.ebrahimi16153.cinemahub.viewmodel.SavedViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
 
 @Composable
@@ -34,7 +34,8 @@ fun Navigation(
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
     discoverViewModel: DiscoverViewModel,
-    detailsViewModel: DetailsViewModel
+    detailsViewModel: DetailsViewModel,
+    savedViewModel: SavedViewModel
 ) {
 
     ////////////////////////DISCOVER VALUES/////////////////////////////////////////////////////////
@@ -76,7 +77,7 @@ fun Navigation(
         }
 
         composable(Route.Saved.name) {
-            SaveScreen(navHostController = navHostController)
+            SaveScreen(savedViewModel = savedViewModel,navHostController = navHostController)
 
         }
         composable(Route.Profile.name) {

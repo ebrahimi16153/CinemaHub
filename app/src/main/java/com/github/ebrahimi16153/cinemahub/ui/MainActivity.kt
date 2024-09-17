@@ -8,15 +8,14 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.github.ebrahimi16153.cinemahub.data.repository.DetailsRepository
 import com.github.ebrahimi16153.cinemahub.ui.navigation.MainScaffold
 import com.github.ebrahimi16153.cinemahub.ui.theme.CinemaHubTheme
 import com.github.ebrahimi16153.cinemahub.viewmodel.DetailsViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.DiscoverViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
+import com.github.ebrahimi16153.cinemahub.viewmodel.SavedViewModel
 import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -25,8 +24,7 @@ class MainActivity : ComponentActivity() {
     private val searchViewMode: SearchViewModel by viewModels()
     private val discoverViewModel: DiscoverViewModel by viewModels()
     private val detailsViewModel: DetailsViewModel by viewModels()
-    @Inject
-    lateinit var detailsRepository: DetailsRepository
+    private val savedViewModel: SavedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 searchViewModel = searchViewMode,
                 discoverViewModel = discoverViewModel,
                 detailsViewModel = detailsViewModel,
-                detailsRepository = detailsRepository
+                savedViewModel = savedViewModel
             )
         }
     }
@@ -52,7 +50,7 @@ fun CinemaHub(
     searchViewModel: SearchViewModel,
     discoverViewModel: DiscoverViewModel,
     detailsViewModel: DetailsViewModel,
-    detailsRepository: DetailsRepository
+    savedViewModel: SavedViewModel,
 ) {
     CinemaHubTheme {
         MainScaffold(
@@ -60,6 +58,8 @@ fun CinemaHub(
             homeViewModel = homeViewModel,
             searchViewModel = searchViewModel,
             discoverViewModel = discoverViewModel,
-            detailsViewModel = detailsViewModel)
+            detailsViewModel = detailsViewModel,
+            savedViewModel = savedViewModel
+        )
     }
 }

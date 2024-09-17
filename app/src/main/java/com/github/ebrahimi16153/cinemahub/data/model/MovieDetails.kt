@@ -1,60 +1,76 @@
 package com.github.ebrahimi16153.cinemahub.data.model
 
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
+import com.github.ebrahimi16153.cinemahub.utils.MOVIE_TABLE
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = MOVIE_TABLE)
 data class MovieDetail(
     @SerializedName("adult")
-    val adult: Boolean?, // false
+    @Ignore
+    var adult: Boolean? = null, // false
     @SerializedName("backdrop_path")
-    val backdropPath: String?, // /rrwt0u1rW685u9bJ9ougg5HJEHC.jpg
+    @Ignore
+    var backdropPath: String? = null, // /rrwt0u1rW685u9bJ9ougg5HJEHC.jpg
+    @Ignore
     @SerializedName("belongs_to_collection")
-    val belongsToCollection: BelongsToCollection?,
+    var belongsToCollection: BelongsToCollection? = null,
     @SerializedName("budget")
-    val budget: Int?, // 150000000
+    var budget: Int? = null, // 150000000
     @SerializedName("genres")
-    val genres: List<Genre>,
+    @Ignore
+    var genres: List<Genre>? = null,
     @SerializedName("homepage")
-    val homepage: String?, // https://www.netflix.com/title/81076856
+    @Ignore
+    var homepage: String? = null, // https://www.netflix.com/title/81076856
     @SerializedName("id")
-    val id: Int, // 280180
+    @PrimaryKey(autoGenerate = false)
+    var id: Int = 0, // 280180
     @SerializedName("imdb_id")
-    val imdbId: String?, // tt3083016
+    @Ignore
+    var imdbId: String? = null, // tt3083016
     @SerializedName("origin_country")
-    val originCountry: List<String?>?,
+    @Ignore
+    var originCountry: List<String>? = null,
     @SerializedName("original_language")
-    val originalLanguage: String?, // en
+    var originalLanguage: String? = null, // en
     @SerializedName("original_title")
-    val originalTitle: String?, // Beverly Hills Cop: Axel F
+    var originalTitle: String? = null, // Beverly Hills Cop: Axel F
     @SerializedName("overview")
-    val overview: String?, // Forty years after his unforgettable first case in Beverly Hills, Detroit cop Axel Foley returns to do what he does best: solve crimes and cause chaos.
+    var overview: String? = null, // Forty years after his unforgettable first case in Beverly Hills, Detroit cop Axel Foley returns to do what he does best: solve crimes and cause chaos.
     @SerializedName("popularity")
-    val popularity: Double?, // 1214.968
+    var popularity: Double? = null, // 1214.968
     @SerializedName("poster_path")
-    val posterPath: String?, // /zszRKfzjM5jltiq8rk6rasKVpUv.jpg
+    var posterPath: String? = null, // /zszRKfzjM5jltiq8rk6rasKVpUv.jpg
     @SerializedName("production_companies")
-    val productionCompanies: List<ProductionCompany>,
+    @Ignore
+    var productionCompanies: List<ProductionCompany>? = null,
     @SerializedName("production_countries")
-    val productionCountries: List<ProductionCountry>,
+    @Ignore
+    var productionCountries: List<ProductionCountry>? = null,
     @SerializedName("release_date")
-    val releaseDate: String?, // 2024-06-20
+    var releaseDate: String? = null, // 2024-06-20
     @SerializedName("revenue")
-    val revenue: Int?, // 0
+    var revenue: Int? = null, // 0
     @SerializedName("runtime")
-    val runtime: Int?, // 118
+    var runtime: Int? = null, // 118
     @SerializedName("spoken_languages")
-    val spokenLanguages: List<SpokenLanguage?>?,
+    @Ignore
+    var spokenLanguages: List<SpokenLanguage>? = null,
     @SerializedName("status")
-    val status: String?, // Released
+    var status: String? = null, // Released
     @SerializedName("tagline")
-    val tagline: String?,
+    var tagline: String? = null,
     @SerializedName("title")
-    val title: String?, // Beverly Hills Cop: Axel F
+    var title: String? = null, // Beverly Hills Cop: Axel F
     @SerializedName("video")
-    val video: Boolean?, // false
+    var video: Boolean? = null, // false
     @SerializedName("vote_average")
-    val voteAverage: Double?, // 6.887
+    var voteAverage: Double? = null, // 6.887
     @SerializedName("vote_count")
-    val voteCount: Int? // 613
+    var voteCount: Int? = null // 613
 ) {
     data class BelongsToCollection(
         @SerializedName("backdrop_path")

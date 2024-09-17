@@ -25,13 +25,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccessTime
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.Bookmark
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.MovieFilter
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -93,7 +97,6 @@ fun Details(
      */
 
 
-
     val movieDetail = detailsViewModel.movieDetail.collectAsState()
 
     val movieImages = detailsViewModel.movieImages.collectAsState()
@@ -104,21 +107,25 @@ fun Details(
 
     val error = detailsViewModel.error.collectAsState()
 
+    val isSaved = detailsViewModel.isMovieExist.collectAsState()
+
 
     LaunchedEffect(key1 = true) {
 
-            detailsViewModel.getMovieDetail(movieID)
+        detailsViewModel.getMovieDetail(movieID)
 
-            detailsViewModel.getMovieImages(movieID )
+        detailsViewModel.getMovieImages(movieID)
 
-            detailsViewModel.getMovieTrailers(movieID)
+        detailsViewModel.getMovieTrailers(movieID)
 
-            detailsViewModel.getMovieCredits(movieID)
+        detailsViewModel.getMovieCredits(movieID)
+
+        detailsViewModel.getIsMovieExist(movieID)
 
 
     }
 
-    when(error.value){
+    when (error.value) {
         is Wrapper.Error -> {
             ErrorBox(message = (error.value as Wrapper.Error).message) {
                 detailsViewModel.apply {
@@ -129,23 +136,34 @@ fun Details(
                 }
             }
         }
+
         Wrapper.Idle -> {
 
-            if (movieDetail.value is Wrapper.Loading || movieImages.value is Wrapper.Loading || movieTrailers.value is Wrapper.Loading || movieCredits.value is Wrapper.Loading){
+            if (movieDetail.value is Wrapper.Loading || movieImages.value is Wrapper.Loading || movieTrailers.value is Wrapper.Loading || movieCredits.value is Wrapper.Loading) {
                 MyCircularProgress()
-            }else if (movieDetail.value is Wrapper.Success && movieImages.value is Wrapper.Success && movieTrailers.value is Wrapper.Success && movieCredits.value is Wrapper.Success){
+            } else if (movieDetail.value is Wrapper.Success && movieImages.value is Wrapper.Success && movieTrailers.value is Wrapper.Success && movieCredits.value is Wrapper.Success) {
                 DetailsOrientation(
                     movieDetail = (movieDetail.value as Wrapper.Success).data,
                     posters = (movieImages.value as Wrapper.Success).data,
-                    trailers =( movieTrailers.value as Wrapper.Success).data ,
-                    navHostController =navHostController ,
-                    movieCredits =( movieCredits.value as Wrapper.Success).data
+                    trailers = (movieTrailers.value as Wrapper.Success).data,
+                    navHostController = navHostController,
+                    movieCredits = (movieCredits.value as Wrapper.Success).data,
+                    isSave = isSaved.value,
+                    onSaveClick = {
+                        if (isSaved.value) {
+                            detailsViewModel.deleteMovie((movieDetail.value as Wrapper.Success).data)
+                        } else {
+                            detailsViewModel.saveMovie((movieDetail.value as Wrapper.Success).data)
+                        }
+
+                    }
                 )
             }
 
 
         }
-        Wrapper.Loading ->{}
+
+        Wrapper.Loading -> {}
         is Wrapper.Success -> {}
     }
 
@@ -158,7 +176,9 @@ fun DetailsOrientation(
     posters: List<MovieImages.Poster?>,
     trailers: List<Trailers.Trailer>,
     navHostController: NavHostController,
-    movieCredits: Credits
+    movieCredits: Credits,
+    isSave: Boolean,
+    onSaveClick: () -> Unit
 ) {
 
 
@@ -172,8 +192,9 @@ fun DetailsOrientation(
             navHostController = navHostController,
             trailers = trailers,
             movieCredits = movieCredits,
-            onSaveClick = { itPosters, itMovieDetail ->
-
+            isSave = isSave,
+            onSaveClick = {
+                onSaveClick()
             }
 
         )
@@ -183,7 +204,11 @@ fun DetailsOrientation(
             posters = posters,
             trailers = trailers,
             movieCredits = movieCredits,
-            navHostController = navHostController
+            navHostController = navHostController,
+            isSave = isSave,
+            onSaveClick = {
+                onSaveClick()
+            }
         )
 
     }
@@ -197,6 +222,8 @@ fun DetailsPortrait(
     trailers: List<Trailers.Trailer>,
     navHostController: NavHostController,
     movieCredits: Credits,
+    isSave: Boolean,
+    onSaveClick: () -> Unit
 ) {
     LazyColumn {
         item {
@@ -206,8 +233,11 @@ fun DetailsPortrait(
                     .height(650.dp),
                 posters = posters,
                 movieDetail = movieDetail,
+                isSave = isSave,
                 onNavClick = { navHostController.navigateUp() },
-                onSaveClick = { _, _ -> }
+                onSaveClick = {
+                    onSaveClick()
+                }
 
             )
         }
@@ -238,9 +268,9 @@ fun DetailsLandScape(
     posters: List<MovieImages.Poster?>,
     navHostController: NavHostController,
     trailers: List<Trailers.Trailer>,
-    onSaveClick: (List<MovieImages.Poster?>, MovieDetail) -> Unit,
+    onSaveClick: () -> Unit,
     movieCredits: Credits,
-//    movieCredits: Credits
+    isSave: Boolean
 ) {
 
     Row(modifier = Modifier.fillMaxSize()) {
@@ -253,8 +283,9 @@ fun DetailsLandScape(
                 modifier = Modifier.fillMaxSize(),
                 posters = posters,
                 movieDetail = movieDetail,
+                isSave = isSave,
                 onNavClick = { navHostController.navigateUp() },
-                onSaveClick = { itPosters, itMovieDetail -> onSaveClick(itPosters, itMovieDetail) })
+                onSaveClick = { onSaveClick() })
         }
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             item {
@@ -285,8 +316,9 @@ fun MovieBanner(
     modifier: Modifier = Modifier,
     posters: List<MovieImages.Poster?>,
     movieDetail: MovieDetail,
-    onSaveClick: (List<MovieImages.Poster?>, MovieDetail) -> Unit = { _, _ -> },
-    onNavClick: () -> Unit
+    onSaveClick: () -> Unit,
+    onNavClick: () -> Unit,
+    isSave: Boolean
 ) {
 
     Box(modifier = modifier) {
@@ -311,12 +343,20 @@ fun MovieBanner(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 //navigation
-                FilledIconButton(onClick = { onNavClick() }) {
-                    Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = "")
+                IconButton(onClick = { onNavClick() }) {
+                    Icon(
+                        imageVector = Icons.Rounded.ArrowBackIosNew,
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
                 //save
-                FilledIconButton(onClick = { onSaveClick(posters, movieDetail) }) {
-                    Icon(imageVector = Icons.Rounded.Bookmark, contentDescription = "")
+                IconButton(onClick = { onSaveClick() }) {
+                    Icon(
+                        imageVector = if (isSave) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                        contentDescription = "",
+                        tint = if (isSave) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    )
                 }
             }
 
@@ -578,7 +618,7 @@ fun MovieCompany(movieDetail: MovieDetail) {
     LazyRow(
         horizontalArrangement = Arrangement.Center
     ) {
-        items(items = movieDetail.productionCompanies) {
+        items(items = movieDetail.productionCompanies!!) {
             CircleItems(name = it.name.toString(), imagePath = IMAGE_URL + it.logoPath)
         }
     }
