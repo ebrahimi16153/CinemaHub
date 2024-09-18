@@ -24,17 +24,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentRecomposeScope
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -49,19 +41,16 @@ import com.github.ebrahimi16153.cinemahub.ui.componnet.ErrorBox
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GenreItem
 import com.github.ebrahimi16153.cinemahub.ui.componnet.GridMovieItems
 import com.github.ebrahimi16153.cinemahub.ui.componnet.RowMovieItems
-import com.github.ebrahimi16153.cinemahub.utils.MyExtension.toGenre
 import com.github.ebrahimi16153.cinemahub.utils.Route
-import com.github.ebrahimi16153.cinemahub.viewmodel.DiscoverViewModel
-import com.github.ebrahimi16153.cinemahub.viewmodel.SearchViewModel
 
 @Composable
 fun DiscoverScreen(
     navHostController: NavHostController,
     genreID: Int,
-    genreName: String,
     isGrid: Boolean,
     movies: LazyPagingItems<Movie>,
     genres: List<Genre>,
+    selected: Int,
     onGridClick: () -> Unit,
     onGenreClick: (Genre) -> Unit,
 ) {
@@ -71,10 +60,6 @@ fun DiscoverScreen(
             movies.refresh()
         })
     }
-
-
-    var currentGenreID by remember { mutableIntStateOf(genreID) }
-    var currentGenreName by remember { mutableStateOf(genreName) }
 
     //GET movies
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -96,7 +81,7 @@ fun DiscoverScreen(
                             contentDescription = stringResource(R.string.back_navigation)
                         )
                     }
-                    Text(text = currentGenreName)
+                    genres[selected].name?.let { Text(text = it) }
                     Spacer(modifier = Modifier.height(10.dp))
                 }
                 IconButton(onClick = { onGridClick() }) {
@@ -109,12 +94,10 @@ fun DiscoverScreen(
 
             if (genreID != -1) {
                 GenresList(
-                    currentGenre = currentGenreID,
+                    selected = selected,
                     genres = genres,
                     onGenreClick = { itGenre ->
                         onGenreClick(itGenre)
-                        currentGenreID = itGenre.id
-                        currentGenreName = itGenre.name.toString()
                     })
             }
 
@@ -158,13 +141,13 @@ fun DiscoverScreen(
 
 
 @Composable
-fun GenresList(currentGenre: Int, genres: List<Genre>, onGenreClick: (Genre) -> Unit) {
+fun GenresList(selected: Int, genres: List<Genre>, onGenreClick: (Genre) -> Unit) {
 
     // state is a way to show FirstVisibleItem by index
     // so first find index of item and pass it to rememberLazyListState like blow code:
 
-    val indexed = genres.indexOf(currentGenre.toGenre(genres))
-    val state = rememberLazyListState(initialFirstVisibleItemIndex = indexed)
+
+    val state = rememberLazyListState(initialFirstVisibleItemIndex = selected)
     LazyRow(
         state = state,
         contentPadding = PaddingValues(horizontal = 16.dp),
@@ -172,7 +155,7 @@ fun GenresList(currentGenre: Int, genres: List<Genre>, onGenreClick: (Genre) -> 
     ) {
         itemsIndexed(genres, key = { _, movie -> movie.id }) { _, genre ->
             GenreItem(
-                isSelected = currentGenre == genre.id,
+                isSelected = selected == genres.indexOf(genre),
                 genre = genre,
                 onGenreClick = { onGenreClick(it) })
         }
@@ -219,8 +202,6 @@ fun DiscoverRowMovieList(movies: LazyPagingItems<Movie>, onMovieClick: (Int) -> 
         contentPadding = PaddingValues(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-
-
         items(count = movies.itemCount) { itIndex ->
 
             movies[itIndex]?.let {
@@ -230,6 +211,4 @@ fun DiscoverRowMovieList(movies: LazyPagingItems<Movie>, onMovieClick: (Int) -> 
             }
         }
     }
-
-
 }

@@ -81,7 +81,7 @@ fun Navigation(
 
         }
         composable(Route.Profile.name) {
-            ProfileScreen(navHostController = navHostController)
+            ProfileScreen()
 
         }
 
@@ -90,21 +90,25 @@ fun Navigation(
 
             genreId = backStackEntry.arguments?.getString("genreID") ?: "-1"
             genreName = backStackEntry.arguments?.getString("genreName") ?: ""
+            val selectedGenre = discoverViewModel.selectedGenre
 
             if (discoverMovies.loadState.refresh !is LoadState.Loading) {
                 DiscoverScreen(
                     navHostController = navHostController,
-                    genreName = genreName,
                     genreID = genreId.toInt(),
+                    isGrid = isGrid,
                     movies = discoverMovies,
                     genres = (genres as Wrapper.Success).data,
-                    isGrid = isGrid,
-                    onGenreClick = { itGenre ->
-                        genreId.let { discoverViewModel.getMoviesByGenre(itGenre.id.toString()) }
-
-                    },
+                    selected = selectedGenre.value,
                     onGridClick = {
                         discoverViewModel.setIsGrid(!isGrid)
+                    },
+                    onGenreClick = { itGenre ->
+                        genreId.let {
+                            discoverViewModel.getMoviesByGenre(itGenre.id.toString())
+                            discoverViewModel.setSelectedGenre((genres as Wrapper.Success).data.indexOf(itGenre))
+                        }
+
                     })
             } else {
                 MyCircularProgress()

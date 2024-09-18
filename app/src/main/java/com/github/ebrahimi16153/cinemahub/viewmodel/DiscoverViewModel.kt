@@ -1,6 +1,7 @@
 package com.github.ebrahimi16153.cinemahub.viewmodel
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,14 +12,9 @@ import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.repository.DiscoverRepository
 import com.github.ebrahimi16153.cinemahub.data.wrapper.Wrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,6 +24,13 @@ class DiscoverViewModel @Inject constructor(private val discoverRepository: Disc
     ///////////////////////////////Genres////////////////////////////
     init {
         getGenres()
+    }
+
+    /////////////////////////////selectedGenre/////////////////////////////////////////
+
+    val selectedGenre : MutableState<Int> = mutableIntStateOf(0)
+    fun setSelectedGenre(value:Int) = viewModelScope.launch {
+        selectedGenre.value = value
     }
 
     ///////////////////////isGrid//////////////////////////////////////////////////////////////////
