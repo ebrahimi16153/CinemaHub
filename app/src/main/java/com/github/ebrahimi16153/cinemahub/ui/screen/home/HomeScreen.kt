@@ -28,9 +28,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,8 +55,7 @@ import com.github.ebrahimi16153.cinemahub.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(
     navHostController: NavHostController,
-    homeViewModel: HomeViewModel,
-    recomposeScope: RecomposeScope
+    homeViewModel: HomeViewModel
 ) {
 
      LaunchedEffect(key1 = true) {

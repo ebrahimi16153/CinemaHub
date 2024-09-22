@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.ebrahimi16153.cinemahub.data.model.Genre
-import com.github.ebrahimi16153.cinemahub.ui.theme.CinemaHubTheme
 
 
 ///////////////////////////Genre Item//////////////////////

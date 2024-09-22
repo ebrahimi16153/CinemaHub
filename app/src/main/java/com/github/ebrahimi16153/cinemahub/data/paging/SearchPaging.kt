@@ -4,7 +4,6 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.server.ApiServices
-import retrofit2.http.Query
 
 class SearchPaging(private val apiServices: ApiServices, private val searchQuery: String):
     PagingSource<Int, Movie>() {

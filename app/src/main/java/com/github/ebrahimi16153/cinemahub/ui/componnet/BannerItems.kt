@@ -73,7 +73,7 @@ fun BannerItems(isLandscape: Boolean, movie: Movie, onBannerClick: (Int) -> Unit
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     movie.title?.let { Text(text = it) }
-                    Button(onClick = { movie.id?.let { onBannerClick(it) } }) {
+                    Button(onClick = { onBannerClick(movie.id) }) {
                         Text(text = stringResource(id = R.string.watch_now))
                     }
                     Text(text = stringResource(id = R.string.exclusive))

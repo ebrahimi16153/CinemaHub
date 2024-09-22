@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetail
 import com.github.ebrahimi16153.cinemahub.utils.MOVIE_TABLE
 import kotlinx.coroutines.flow.Flow

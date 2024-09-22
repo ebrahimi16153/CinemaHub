@@ -10,12 +10,3 @@ val BOTTOM_ITEMS = listOf(Route.Home,Route.Search,Route.Saved,Route.Profile)
 const val MOVIE_TABLE = "movie_table"
 const val APP_DATABASE  = "app_database"
 
-
-fun Int.toHours(mint:Double): String {
-    val doubleHours = mint/60
-    val hours  = doubleHours.toInt()
-    val m = (doubleHours - hours) * 60
-
-    return "$hours: ${m.toInt()}"
-
-}

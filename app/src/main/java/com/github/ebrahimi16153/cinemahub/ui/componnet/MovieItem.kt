@@ -1,6 +1,5 @@
 package com.github.ebrahimi16153.cinemahub.ui.componnet
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,13 +21,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.github.ebrahimi16153.cinemahub.R
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.utils.IMAGE_URL
 import java.util.Locale
@@ -48,7 +44,7 @@ fun GridMovieItems(movie: Movie, onMovieClick: (Int) -> Unit = {}) {
             .width(130.dp)
             .height(200.dp)
             .padding(horizontal = 2.dp)
-            .clickable { movie.id?.let { onMovieClick(it) } }
+            .clickable { onMovieClick(movie.id) }
             .clip(RoundedCornerShape(8.dp))
     ) {
         AsyncImage(
@@ -90,7 +86,7 @@ fun RowMovieItems(
 
     Surface(modifier = Modifier
         .fillMaxWidth()
-        .padding(horizontal = 16.dp).clickable { onMovieClick(movie.id?: -1) }, shape = RoundedCornerShape(10.dp)) {
+        .padding(horizontal = 16.dp).clickable { onMovieClick(movie.id) }, shape = RoundedCornerShape(10.dp)) {
         Row {
             AsyncImage(modifier = Modifier.width(130.dp), model = IMAGE_URL+movie.posterPath, contentDescription ="" )
             Column(horizontalAlignment = Alignment.CenterHorizontally,modifier = Modifier

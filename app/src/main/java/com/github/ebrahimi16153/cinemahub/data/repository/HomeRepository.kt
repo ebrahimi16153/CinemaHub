@@ -1,15 +1,11 @@
 package com.github.ebrahimi16153.cinemahub.data.repository
 
-import android.util.Log
 import com.github.ebrahimi16153.cinemahub.data.model.Genre
-import com.github.ebrahimi16153.cinemahub.data.model.GenresOfMovie
 import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.server.ApiServices
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
-import kotlin.time.Duration
 
 class HomeRepository @Inject constructor(private val apiServices: ApiServices) {
 

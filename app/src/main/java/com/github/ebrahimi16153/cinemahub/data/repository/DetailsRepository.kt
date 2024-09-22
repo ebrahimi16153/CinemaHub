@@ -2,7 +2,6 @@ package com.github.ebrahimi16153.cinemahub.data.repository
 
 import com.github.ebrahimi16153.cinemahub.data.local.MovieDao
 import com.github.ebrahimi16153.cinemahub.data.model.Credits
-import com.github.ebrahimi16153.cinemahub.data.model.Movie
 import com.github.ebrahimi16153.cinemahub.data.model.MovieDetail
 import com.github.ebrahimi16153.cinemahub.data.model.MovieImages
 import com.github.ebrahimi16153.cinemahub.data.model.Trailers
