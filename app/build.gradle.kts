@@ -106,7 +106,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     //icons
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
     //image Loader Coil
     implementation("io.coil-kt:coil-compose:2.7.0")

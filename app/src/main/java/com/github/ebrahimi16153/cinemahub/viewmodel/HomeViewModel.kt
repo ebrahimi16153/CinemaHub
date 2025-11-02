@@ -103,8 +103,6 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
             _topRateMovie.value = Wrapper.Idle
             _error.value = Wrapper.Error(message = e.message.toString())
         }
-
-
     }
 
     ////////////////////////////Popular Movie//////////////////////////
@@ -145,5 +143,4 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
         }
 
     }
-
 }
