@@ -93,7 +93,7 @@ All data is fetched in real time from the server — no offline cache is used.
 ## 📦 Installation
 Download the latest APK file from the link below:
 
-➡️ [Download Version 1.0](./app/release/app-release.apk)
+➡️ [Download Version 1.0](https://github.com/ebrahimi16153/CinemaHub/releases/download/V.1/app-release.apk)
 
 After downloading, install the file on your Android device.  
 If needed, enable **“Allow installation from unknown sources”** in your device settings.
