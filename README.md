@@ -104,4 +104,3 @@ If needed, enable **“Allow installation from unknown sources”** in your devi
 If you have any feedback, suggestions, or find a bug, feel free to open an issue or contact me directly:
 
 📧 [ebrahimi2723@gmail.com](mailto:ebrahimi2723@gmail.com)
-🌐 [LinkedIn Profile](https://linkedin.com/in/yourname)
